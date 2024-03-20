@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         goFishButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, FishingGame.class));
+                startActivity(new Intent(MainActivity.this, Map.class));
             }
         });
     }

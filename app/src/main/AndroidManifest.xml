@@ -15,7 +15,7 @@
             android:name=".FishingGame"
             android:exported="false" />
         <activity
-            android:name=".MapActivity"
+            android:name=".Map"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
