@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
-public class MapActivity extends AppCompatActivity {
+public class Map extends AppCompatActivity {
     private ImageView fishMapImage;
 
     private ImageButton beachButton;
@@ -28,7 +28,7 @@ public class MapActivity extends AppCompatActivity {
         View.OnClickListener buttonClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MapActivity.this, MainActivity.class);
+                Intent intent = new Intent(Map.this, FishingGame.class);
                 startActivity(intent);
             }
         };
@@ -36,9 +36,5 @@ public class MapActivity extends AppCompatActivity {
         dockButton.setOnClickListener(buttonClickListener);
         lakeButton.setOnClickListener(buttonClickListener);
 
-    }
-    public void fishing() {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
     }
 }
