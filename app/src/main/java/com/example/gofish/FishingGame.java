@@ -88,13 +88,14 @@ public class FishingGame extends AppCompatActivity {
     private void waitForFish() {
         Random rand = new Random();
         int minDelay = 5000;
-        int maxDelay = 8000;
+        int maxDelay = 10000;
         int delay = rand.nextInt(maxDelay - minDelay) + minDelay;
-
+        fishOnHookPlayer.start();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 fishStartsNibbling();
+                fishOnHookPlayer.stop();
             }
         }, delay);
     }
@@ -104,6 +105,7 @@ public class FishingGame extends AppCompatActivity {
         super.onDestroy();
         ambientLakePlayer.release();
         castLinePlayer.release();
+        fishOnHookPlayer.release();
         vibrator.cancel();
     }
 
