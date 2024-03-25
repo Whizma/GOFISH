@@ -35,7 +35,6 @@ public class FishingGame extends AppCompatActivity {
 
     private MediaPlayer castLinePlayer;
     private MediaPlayer ambientLakePlayer;
-    private MediaPlayer ambientSoundPlayer;
     private MediaPlayer lowBubblePlayer;
     private MediaPlayer loudBubblePlayer;
     private MediaPlayer exclamationsPlayer;
@@ -68,10 +67,7 @@ public class FishingGame extends AppCompatActivity {
         castLinePlayer = MediaPlayer.create(this, R.raw.fishing_splash);
         lowBubblePlayer = MediaPlayer.create(this, R.raw.low_instensity_bubbles);
         loudBubblePlayer = MediaPlayer.create(this, R.raw.bubble);
-        //ambientLakePlayer = MediaPlayer.create(this, R.raw.ambient_lake);
         exclamationsPlayer = MediaPlayer.create(this, exclamations[new Random().nextInt(exclamations.length)]);
-
-        ambientLakePlayer.start();
 
         background = findViewById(R.id.horizon);
 
@@ -216,7 +212,7 @@ public class FishingGame extends AppCompatActivity {
         public void onSensorChanged(SensorEvent event) {
             float x = event.values[0];
             float z = event.values[2];
-            if (x < 8 || z < 8) {
+            if (x > 8 || z > 8) {
                 caughtFish();
             }
         }
