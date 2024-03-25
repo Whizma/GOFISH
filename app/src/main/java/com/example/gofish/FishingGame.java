@@ -9,6 +9,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
@@ -31,8 +32,8 @@ public class FishingGame extends AppCompatActivity {
 
     private MediaPlayer castLinePlayer;
     private MediaPlayer ambientLakePlayer;
-
-    private MediaPlayer fishOnHookPlayer;
+    private MediaPlayer lowBubblePlayer;
+    private MediaPlayer loudBubblePlayer;
 
     private Vibrator vibrator;
 
@@ -54,7 +55,8 @@ public class FishingGame extends AppCompatActivity {
 
 
         castLinePlayer = MediaPlayer.create(this, R.raw.fishing_splash);
-        fishOnHookPlayer = MediaPlayer.create(this, R.raw.bubble);
+        lowBubblePlayer = MediaPlayer.create(this, R.raw.low_instensity_bubbles);
+        loudBubblePlayer = MediaPlayer.create(this, R.raw.bubble);
         ambientLakePlayer = MediaPlayer.create(this, R.raw.ambient_lake);
         ambientLakePlayer.start();
 
@@ -79,7 +81,8 @@ public class FishingGame extends AppCompatActivity {
         super.onDestroy();
         ambientLakePlayer.release();
         castLinePlayer.release();
-        fishOnHookPlayer.release();
+        lowBubblePlayer.release();
+        loudBubblePlayer.release();
         vibrator.cancel();
     }
 
@@ -88,9 +91,13 @@ public class FishingGame extends AppCompatActivity {
         int minDelay = 5000;
         int maxDelay = 10000;
         int delay = rand.nextInt(maxDelay - minDelay) + minDelay;
+
+        lowBubblePlayer.start();
+
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
+                //lowBubblePlayer.stop();
                 fishStartsNibbling();
             }
         }, delay);
@@ -103,7 +110,7 @@ public class FishingGame extends AppCompatActivity {
 
         rod.setRotationX(50);
 
-        fishOnHookPlayer.start();
+        loudBubblePlayer.start();
 
 
         long[] timings = new long[] { 300, 800 };
@@ -118,13 +125,12 @@ public class FishingGame extends AppCompatActivity {
             @Override
             public void run() {
                 // Failed to catch fish
-                fishOnHookPlayer.stop();
                 sensorManager.unregisterListener(nibblingSensorListener);
                 sensorManager.registerListener(castLineSensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
                 vibrator.cancel();
                 rod.setRotationX(0);
             }
-        }, 4000);
+        }, 5000);
     }
 
     private void vibrationGoesCrazy() {
@@ -163,7 +169,7 @@ public class FishingGame extends AppCompatActivity {
             float x = event.values[0];
             float z = event.values[2];
             if (x < 5 || z < 5) {
-
+                
             }
         }
 
