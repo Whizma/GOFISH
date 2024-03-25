@@ -29,6 +29,9 @@ public class FishingGame extends AppCompatActivity {
 
     private MediaPlayer castLinePlayer;
     private MediaPlayer ambientLakePlayer;
+
+    private MediaPlayer fishOnHookPlayer;
+
     private Vibrator vibrator;
 
     private ImageView rod;
@@ -46,6 +49,7 @@ public class FishingGame extends AppCompatActivity {
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
         castLinePlayer = MediaPlayer.create(this, R.raw.fishing_splash);
+        fishOnHookPlayer = MediaPlayer.create(this, R.raw.bubble);
         ambientLakePlayer = MediaPlayer.create(this, R.raw.ambient_lake);
         ambientLakePlayer.start();
 
@@ -70,13 +74,14 @@ public class FishingGame extends AppCompatActivity {
     private void waitForFish() {
         Random rand = new Random();
         int minDelay = 5000;
-        int maxDelay = 8000;
+        int maxDelay = 10000;
         int delay = rand.nextInt(maxDelay - minDelay) + minDelay;
-
+        fishOnHookPlayer.start();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 fishStartsNibbling();
+                fishOnHookPlayer.stop();
             }
         }, delay);
     }
@@ -86,6 +91,7 @@ public class FishingGame extends AppCompatActivity {
         super.onDestroy();
         ambientLakePlayer.release();
         castLinePlayer.release();
+        fishOnHookPlayer.release();
         vibrator.cancel();
     }
 
