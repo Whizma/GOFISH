@@ -66,21 +66,7 @@ public class FishingGame extends AppCompatActivity {
         sensorManager.registerListener(new CastLineSensorListener(), sensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        float x = event.values[0];
-        float z = event.values[2];
 
-        if (x > 8 || z > 8) {
-            castLinePlayer.start();
-            waitForFish();
-        }
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-    }
     private void waitForFish() {
         Random rand = new Random();
         int minDelay = 5000;
@@ -105,7 +91,9 @@ public class FishingGame extends AppCompatActivity {
 
     private void fishStartsNibbling() {
         // play sounds
-        // 
+        //
+        rod.setRotationX(50);
+
         long[] timings = new long[] { 300, 800 };
         int[] amplitudes = new int[] { 255, 0 };
         int repeatIndex = 0;
@@ -123,7 +111,6 @@ public class FishingGame extends AppCompatActivity {
     }
 
     private void vibrationGoesCrazy() {
-        rod.setRotationX(50);
         long[] timings = new long[] { 50, 50, 50, 50, 50, 100, 350, 25, 25, 25, 25, 200 };
         int[] amplitudes = new int[] { 33, 51, 75, 113, 170, 255, 0, 38, 62, 100, 160, 255 };
         int repeatIndex = 1;
@@ -137,7 +124,30 @@ public class FishingGame extends AppCompatActivity {
 
         @Override
         public void onSensorChanged(SensorEvent event) {
+            float x = event.values[0];
+            float z = event.values[2];
 
+            if (x > 8 || z > 8) {
+                castLinePlayer.start();
+                waitForFish();
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+        }
+    }
+
+    class FishNibblingSensorListener implements SensorEventListener {
+
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            float x = event.values[0];
+            float z = event.values[2];
+            if (x < 5) {
+                
+            }
         }
 
         @Override
