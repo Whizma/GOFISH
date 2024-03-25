@@ -54,7 +54,7 @@ public class FishingGame extends AppCompatActivity implements SensorEventListene
         /*ambientLakePlayer = MediaPlayer.create(this, R.raw.ambient_lake);
         ambientLakePlayer.start();*/
         background = findViewById(R.id.horizon);
-        ocean = findViewById(R.id.ocean);
+        //ocean = findViewById(R.id.ocean);
 
         chosenLocation(location);
 
@@ -109,6 +109,7 @@ public class FishingGame extends AppCompatActivity implements SensorEventListene
         switch(location) {
             case "lake":
                 ambientLakePlayer = MediaPlayer.create(this, R.raw.ambient_lake);
+                background.setImageResource(R.drawable.lake);
                 break;
             case "beach":
                 ambientLakePlayer = MediaPlayer.create(this, R.raw.beach);
@@ -116,7 +117,7 @@ public class FishingGame extends AppCompatActivity implements SensorEventListene
             case "dock":
                 ambientLakePlayer = MediaPlayer.create(this, R.raw.dock);
                 background.setImageResource(R.drawable.dockbg);
-                ocean.setVisibility(View.GONE);
+
                 break;
         }
 
