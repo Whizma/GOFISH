@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.view.View;
 import android.widget.ImageView;
 
 import java.util.Random;
@@ -29,9 +30,12 @@ public class FishingGame extends AppCompatActivity implements SensorEventListene
 
     private MediaPlayer castLinePlayer;
     private MediaPlayer ambientLakePlayer;
+    private MediaPlayer ambientSoundPlayer;
     private Vibrator vibrator;
 
     private ImageView rod;
+    private ImageView background;
+    private ImageView ocean;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,8 +51,12 @@ public class FishingGame extends AppCompatActivity implements SensorEventListene
         sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
 
         castLinePlayer = MediaPlayer.create(this, R.raw.fishing_splash);
-        ambientLakePlayer = MediaPlayer.create(this, R.raw.ambient_lake);
-        ambientLakePlayer.start();
+        /*ambientLakePlayer = MediaPlayer.create(this, R.raw.ambient_lake);
+        ambientLakePlayer.start();*/
+        background = findViewById(R.id.horizon);
+        ocean = findViewById(R.id.ocean);
+
+        chosenLocation(location);
 
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
@@ -56,12 +64,6 @@ public class FishingGame extends AppCompatActivity implements SensorEventListene
 
         timer = new Timer();
 
-        ambientLakePlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                ambientLakePlayer.start();
-            }
-        });
     }
 
     @Override
@@ -100,6 +102,31 @@ public class FishingGame extends AppCompatActivity implements SensorEventListene
                 }
             }
         }, delay);
+    }
+
+    private void chosenLocation(String location){
+
+        switch(location) {
+            case "lake":
+                ambientLakePlayer = MediaPlayer.create(this, R.raw.ambient_lake);
+                break;
+            case "beach":
+                ambientLakePlayer = MediaPlayer.create(this, R.raw.beach);
+                break;
+            case "dock":
+                ambientLakePlayer = MediaPlayer.create(this, R.raw.dock);
+                background.setImageResource(R.drawable.dockbg);
+                ocean.setVisibility(View.GONE);
+                break;
+        }
+
+        ambientLakePlayer.start();
+        ambientLakePlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                ambientLakePlayer.start();
+            }
+        });
     }
 
     @Override
