@@ -42,6 +42,7 @@ public class FishingGame extends AppCompatActivity {
     private ImageView rod;
     private ImageView background;
     private ImageView ocean;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +55,7 @@ public class FishingGame extends AppCompatActivity {
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+
         castLineSensorListener = new CastLineSensorListener();
         nibblingSensorListener = new FishNibblingSensorListener();
 
@@ -61,8 +63,8 @@ public class FishingGame extends AppCompatActivity {
         castLinePlayer = MediaPlayer.create(this, R.raw.fishing_splash);
         lowBubblePlayer = MediaPlayer.create(this, R.raw.low_instensity_bubbles);
         loudBubblePlayer = MediaPlayer.create(this, R.raw.bubble);
-        ambientLakePlayer = MediaPlayer.create(this, R.raw.ambient_lake);
-        ambientLakePlayer.start();
+        //ambientLakePlayer = MediaPlayer.create(this, R.raw.ambient_lake);
+        //ambientLakePlayer.start();
         /*ambientLakePlayer = MediaPlayer.create(this, R.raw.ambient_lake);
         ambientLakePlayer.start();*/
         background = findViewById(R.id.horizon);
@@ -76,10 +78,11 @@ public class FishingGame extends AppCompatActivity {
 
         timer = new Timer();
 
+        sensorManager.registerListener(castLineSensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+
+
     }
 
-        sensorManager.registerListener(castLineSensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
-    }
 
     @Override
     protected void onDestroy() {
@@ -118,8 +121,8 @@ public class FishingGame extends AppCompatActivity {
         loudBubblePlayer.start();
 
 
-        long[] timings = new long[] { 300, 800 };
-        int[] amplitudes = new int[] { 255, 0 };
+        long[] timings = new long[]{300, 800};
+        int[] amplitudes = new int[]{255, 0};
         int repeatIndex = 0;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -139,8 +142,8 @@ public class FishingGame extends AppCompatActivity {
     }
 
     private void vibrationGoesCrazy() {
-        long[] timings = new long[] { 50, 50, 50, 50, 50, 100, 350, 25, 25, 25, 25, 200 };
-        int[] amplitudes = new int[] { 33, 51, 75, 113, 170, 255, 0, 38, 62, 100, 160, 255 };
+        long[] timings = new long[]{50, 50, 50, 50, 50, 100, 350, 25, 25, 25, 25, 200};
+        int[] amplitudes = new int[]{33, 51, 75, 113, 170, 255, 0, 38, 62, 100, 160, 255};
         int repeatIndex = 1;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -167,24 +170,9 @@ public class FishingGame extends AppCompatActivity {
         }
     }
 
-    class FishNibblingSensorListener implements SensorEventListener {
+    private void chosenLocation(String location) {
 
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-            float x = event.values[0];
-            float z = event.values[2];
-            if (x < 5 || z < 5) {
-
-            }
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-        }
-    private void chosenLocation(String location){
-
-        switch(location) {
+        switch (location) {
             case "lake":
                 ambientLakePlayer = MediaPlayer.create(this, R.raw.ambient_lake);
                 background.setImageResource(R.drawable.lake);
@@ -208,12 +196,21 @@ public class FishingGame extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        ambientLakePlayer.release();
-        castLinePlayer.release();
-        vibrator.cancel();
+    class FishNibblingSensorListener implements SensorEventListener {
+
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            float x = event.values[0];
+            float z = event.values[2];
+            if (x < 5 || z < 5) {
+
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+        }
     }
 }
 
