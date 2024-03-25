@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.view.View;
 import android.widget.ImageView;
 
 import java.util.Random;
@@ -30,6 +31,7 @@ public class FishingGame extends AppCompatActivity {
 
     Timer timer;
 
+    ImageView fish;
 
     private MediaPlayer castLinePlayer;
     private MediaPlayer ambientLakePlayer;
@@ -69,6 +71,8 @@ public class FishingGame extends AppCompatActivity {
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         rod = findViewById(R.id.rod);
+        fish = findViewById(R.id.fish);
+        fish.setVisibility(View.GONE);
 
         timer = new Timer();
 
@@ -142,6 +146,7 @@ public class FishingGame extends AppCompatActivity {
     private void caughtFish() {
         ambientLakePlayer.stop();
         exclamationsPlayer.start();
+        fish.setVisibility(View.VISIBLE);
         vibrator.cancel();
     }
 
@@ -180,7 +185,7 @@ public class FishingGame extends AppCompatActivity {
         public void onSensorChanged(SensorEvent event) {
             float x = event.values[0];
             float z = event.values[2];
-            if (x < 5 || z < 5) {
+            if (x < 8 || z < 8) {
                 caughtFish();
             }
         }
