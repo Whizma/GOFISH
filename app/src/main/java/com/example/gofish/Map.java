@@ -13,7 +13,6 @@ public class Map extends AppCompatActivity {
 
     private ImageButton beachButton;
     private ImageButton dockButton;
-
     private ImageButton lakeButton;
 
     @Override
@@ -25,16 +24,21 @@ public class Map extends AppCompatActivity {
         dockButton = (ImageButton) findViewById(R.id.dock);
         lakeButton = (ImageButton) findViewById(R.id.lake);
 
-        View.OnClickListener buttonClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Map.this, FishingGame.class);
-                startActivity(intent);
-            }
-        };
-        beachButton.setOnClickListener(buttonClickListener);
-        dockButton.setOnClickListener(buttonClickListener);
-        lakeButton.setOnClickListener(buttonClickListener);
+        beachButton.setOnClickListener(new OnLocationClickListener("beach"));
+        dockButton.setOnClickListener(new OnLocationClickListener("dock"));
+        lakeButton.setOnClickListener(new OnLocationClickListener("lake"));
+    }
 
+    class OnLocationClickListener implements View.OnClickListener {
+        private String location;
+        public OnLocationClickListener(String location) {
+            this.location = location;
+        }
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(Map.this, FishingGame.class);
+            intent.putExtra("location", location);
+            startActivity(intent);
+        }
     }
 }

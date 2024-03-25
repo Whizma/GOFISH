@@ -3,6 +3,7 @@ package com.example.gofish;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -20,12 +21,14 @@ import java.util.TimerTask;
 
 public class FishingGame extends AppCompatActivity implements SensorEventListener {
 
+    private String location;
     private SensorManager sensorManager;
     private Sensor sensor;
 
     Timer timer;
 
     private MediaPlayer castLinePlayer;
+    private MediaPlayer ambientLakePlayer;
     private Vibrator vibrator;
 
     private ImageView rod;
@@ -34,18 +37,31 @@ public class FishingGame extends AppCompatActivity implements SensorEventListene
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fishing_game);
 
+        Intent intent = getIntent();
+        if (intent != null) {
+            location = intent.getStringExtra("location");
+        }
+
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-
-
-        castLinePlayer = MediaPlayer.create(this, R.raw.fishing_splash);
-
         sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
 
+        castLinePlayer = MediaPlayer.create(this, R.raw.fishing_splash);
+        ambientLakePlayer = MediaPlayer.create(this, R.raw.ambient_lake);
+        ambientLakePlayer.start();
+
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
         rod = findViewById(R.id.rod);
 
         timer = new Timer();
+
+        ambientLakePlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                ambientLakePlayer.start();
+            }
+        });
     }
 
     @Override
@@ -86,5 +102,12 @@ public class FishingGame extends AppCompatActivity implements SensorEventListene
         }, delay);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ambientLakePlayer.release();
+        castLinePlayer.release();
+        vibrator.cancel();
+    }
 }
 
