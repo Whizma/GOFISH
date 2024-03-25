@@ -29,6 +29,9 @@ public class FishingGame extends AppCompatActivity implements SensorEventListene
 
     private MediaPlayer castLinePlayer;
     private MediaPlayer ambientLakePlayer;
+
+    private MediaPlayer fishOnHookPlayer;
+
     private Vibrator vibrator;
 
     private ImageView rod;
@@ -47,6 +50,7 @@ public class FishingGame extends AppCompatActivity implements SensorEventListene
         sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
 
         castLinePlayer = MediaPlayer.create(this, R.raw.fishing_splash);
+        fishOnHookPlayer = MediaPlayer.create(this, R.raw.bubble);
         ambientLakePlayer = MediaPlayer.create(this, R.raw.ambient_lake);
         ambientLakePlayer.start();
 
