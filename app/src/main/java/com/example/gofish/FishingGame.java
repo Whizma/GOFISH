@@ -30,10 +30,14 @@ public class FishingGame extends AppCompatActivity {
 
     Timer timer;
 
+
     private MediaPlayer castLinePlayer;
     private MediaPlayer ambientLakePlayer;
     private MediaPlayer lowBubblePlayer;
     private MediaPlayer loudBubblePlayer;
+    private MediaPlayer exclamationsPlayer;
+
+    private int[] exclamations = new int[] {R.raw.ohyeah, R.raw.thatsanicefish, R.raw.woohoo};
 
     private Vibrator vibrator;
 
@@ -58,6 +62,8 @@ public class FishingGame extends AppCompatActivity {
         lowBubblePlayer = MediaPlayer.create(this, R.raw.low_instensity_bubbles);
         loudBubblePlayer = MediaPlayer.create(this, R.raw.bubble);
         ambientLakePlayer = MediaPlayer.create(this, R.raw.ambient_lake);
+        exclamationsPlayer = MediaPlayer.create(this, exclamations[new Random().nextInt(exclamations.length)]);
+
         ambientLakePlayer.start();
 
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
@@ -133,6 +139,12 @@ public class FishingGame extends AppCompatActivity {
         }, 5000);
     }
 
+    private void caughtFish() {
+        ambientLakePlayer.stop();
+        exclamationsPlayer.start();
+        vibrator.cancel();
+    }
+
     private void vibrationGoesCrazy() {
         long[] timings = new long[] { 50, 50, 50, 50, 50, 100, 350, 25, 25, 25, 25, 200 };
         int[] amplitudes = new int[] { 33, 51, 75, 113, 170, 255, 0, 38, 62, 100, 160, 255 };
@@ -169,7 +181,7 @@ public class FishingGame extends AppCompatActivity {
             float x = event.values[0];
             float z = event.values[2];
             if (x < 5 || z < 5) {
-                
+                caughtFish();
             }
         }
 
