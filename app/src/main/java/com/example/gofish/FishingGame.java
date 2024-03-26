@@ -2,6 +2,7 @@ package com.example.gofish;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
@@ -77,7 +78,7 @@ public class FishingGame extends AppCompatActivity {
 
         rod = findViewById(R.id.rod);
         fish = findViewById(R.id.fish);
-        fish.setVisibility(View.GONE);
+        fish.setAlpha(0f);
 
         timer = new Timer();
 
@@ -147,7 +148,13 @@ public class FishingGame extends AppCompatActivity {
     private void caughtFish() {
         ambientLakePlayer.stop();
         exclamationsPlayer.start();
-        fish.setVisibility(View.VISIBLE);
+
+        ObjectAnimator fadeIn = ObjectAnimator.ofFloat(fish, "alpha", 0f, 1f);
+        fadeIn.setDuration(1000); // Adjust the duration as per your preference
+
+        // Start the animation
+        fadeIn.start();
+
         vibrator.cancel();
     }
 
