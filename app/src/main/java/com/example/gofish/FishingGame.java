@@ -10,12 +10,10 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.view.View;
 import android.widget.ImageView;
 
 import java.util.Random;
@@ -35,7 +33,7 @@ public class FishingGame extends AppCompatActivity {
     ImageView fish;
 
     private MediaPlayer castLinePlayer;
-    private MediaPlayer ambientLakePlayer;
+    private MediaPlayer ambientPlayer;
     private MediaPlayer lowBubblePlayer;
     private MediaPlayer loudBubblePlayer;
     private MediaPlayer exclamationsPlayer;
@@ -91,7 +89,7 @@ public class FishingGame extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        ambientLakePlayer.release();
+        ambientPlayer.release();
         castLinePlayer.release();
         lowBubblePlayer.release();
         loudBubblePlayer.release();
@@ -146,11 +144,18 @@ public class FishingGame extends AppCompatActivity {
     }
 
     private void caughtFish() {
-        ambientLakePlayer.stop();
+        ambientPlayer.stop();
         exclamationsPlayer.start();
 
+        sensorManager.unregisterListener(nibblingSensorListener);
+        sensorManager.registerListener(castLineSensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+
         ObjectAnimator fadeIn = ObjectAnimator.ofFloat(fish, "alpha", 0f, 1f);
+        ObjectAnimator fadeOut = ObjectAnimator.ofFloat(fish, "alpha", 1f, 0f);
+
         fadeIn.setDuration(1000); // Adjust the duration as per your preference
+        fadeOut.setDuration(500); // Adjust the duration as per your preference
+
 
         // Start the animation
         fadeIn.start();
@@ -168,14 +173,38 @@ public class FishingGame extends AppCompatActivity {
         }
     }
 
+    private void chosenLocation(String location) {
+
+        switch (location) {
+            case "lake":
+                ambientPlayer = MediaPlayer.create(this, R.raw.ambient_lake);
+                background.setImageResource(R.drawable.lake);
+                break;
+            case "beach":
+                ambientPlayer = MediaPlayer.create(this, R.raw.beach);
+                break;
+            case "dock":
+                ambientPlayer = MediaPlayer.create(this, R.raw.dock);
+                background.setImageResource(R.drawable.dockbg);
+                break;
+        }
+
+        ambientPlayer.start();
+        ambientPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                ambientPlayer.start();
+            }
+        });
+    }
+
     class CastLineSensorListener implements SensorEventListener {
 
         @Override
         public void onSensorChanged(SensorEvent event) {
-            float x = event.values[0];
             float z = event.values[2];
 
-            if (x > 8 || z > 8) {
+            if (z > 5) {
                 castLinePlayer.start();
                 waitForFish();
             }
@@ -187,39 +216,12 @@ public class FishingGame extends AppCompatActivity {
         }
     }
 
-    private void chosenLocation(String location) {
-
-        switch (location) {
-            case "lake":
-                ambientLakePlayer = MediaPlayer.create(this, R.raw.ambient_lake);
-                background.setImageResource(R.drawable.lake);
-                break;
-            case "beach":
-                ambientLakePlayer = MediaPlayer.create(this, R.raw.beach);
-                break;
-            case "dock":
-                ambientLakePlayer = MediaPlayer.create(this, R.raw.dock);
-                background.setImageResource(R.drawable.dockbg);
-
-                break;
-        }
-
-        ambientLakePlayer.start();
-        ambientLakePlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                ambientLakePlayer.start();
-            }
-        });
-    }
-
     class FishNibblingSensorListener implements SensorEventListener {
 
         @Override
         public void onSensorChanged(SensorEvent event) {
-            float x = event.values[0];
             float z = event.values[2];
-            if (x > 8 || z > 8) {
+            if (z < -2) {
                 caughtFish();
             }
         }
