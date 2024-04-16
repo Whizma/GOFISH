@@ -1,7 +1,9 @@
 package com.example.gofish;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.view.View;
 import android.widget.ImageView;
 
 import java.util.Random;
@@ -28,9 +31,10 @@ public class FishingGame extends AppCompatActivity {
     private SensorEventListener castLineSensorListener;
     private SensorEventListener nibblingSensorListener;
 
+    private float currentRotation;
+
     Timer timer;
 
-    ImageView fish;
 
     private MediaPlayer castLinePlayer;
     private MediaPlayer ambientPlayer;
@@ -42,8 +46,11 @@ public class FishingGame extends AppCompatActivity {
 
     private Vibrator vibrator;
 
+    private Random random;
+
     private ImageView rod;
     private ImageView background;
+    private ImageView fish;
     private ImageView ocean;
 
     @Override
@@ -56,12 +63,13 @@ public class FishingGame extends AppCompatActivity {
             location = intent.getStringExtra("location");
         }
 
+        random = new Random();
+
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
         castLineSensorListener = new CastLineSensorListener();
         nibblingSensorListener = new FishNibblingSensorListener();
-
 
         castLinePlayer = MediaPlayer.create(this, R.raw.fishing_splash);
         lowBubblePlayer = MediaPlayer.create(this, R.raw.low_instensity_bubbles);
@@ -80,9 +88,9 @@ public class FishingGame extends AppCompatActivity {
 
         timer = new Timer();
 
+        currentRotation = 0;
+
         sensorManager.registerListener(castLineSensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
-
-
     }
 
 
@@ -105,6 +113,7 @@ public class FishingGame extends AppCompatActivity {
         lowBubblePlayer.start();
 
         timer.schedule(new TimerTask() {
+
             @Override
             public void run() {
                 //lowBubblePlayer.stop();
@@ -150,17 +159,58 @@ public class FishingGame extends AppCompatActivity {
         sensorManager.unregisterListener(nibblingSensorListener);
         sensorManager.registerListener(castLineSensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
 
-        ObjectAnimator fadeIn = ObjectAnimator.ofFloat(fish, "alpha", 0f, 1f);
-        ObjectAnimator fadeOut = ObjectAnimator.ofFloat(fish, "alpha", 1f, 0f);
+        vibrationGoesCrazy();
+        startRotation();
 
-        fadeIn.setDuration(1000); // Adjust the duration as per your preference
-        fadeOut.setDuration(500); // Adjust the duration as per your preference
+        //ObjectAnimator fadeIn = ObjectAnimator.ofFloat(fish, "alpha", 0f, 1f);
+
+        //fadeIn.setDuration(1000); // Adjust the duration as per your preference
 
 
         // Start the animation
-        fadeIn.start();
+       // fadeIn.start();
 
-        vibrator.cancel();
+        //vibrator.cancel();
+    }
+
+    private void startRotation() {
+        // Increment the rotation angle by 1 degree
+
+        int increment = random.nextInt(31) - 15;
+
+        float amplitude = 10f; // Adjust the amplitude for the sway effect
+        float frequency = 0.1f; // Adjust the frequency for the sway effect
+
+        currentRotation = amplitude * (float) Math.sin(frequency) + increment;
+
+        // Create an ObjectAnimator to animate the rotation
+        ObjectAnimator rotationAnimator = ObjectAnimator.ofFloat(rod, View.ROTATION, currentRotation);
+        rotationAnimator.setDuration(random.nextInt(1400) + 300); // Duration in milliseconds (approximately 60 frames per second)
+        rotationAnimator.start();
+
+        // Repeat the animation by recursively calling startRotation()
+        rotationAnimator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(@NonNull Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(@NonNull Animator animation) {
+                startRotation();
+            }
+
+
+            @Override
+            public void onAnimationCancel(@NonNull Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(@NonNull Animator animation) {
+
+            }
+        });
     }
 
     private void vibrationGoesCrazy() {
