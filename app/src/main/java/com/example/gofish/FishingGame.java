@@ -27,6 +27,9 @@ public class FishingGame extends AppCompatActivity {
     private Sensor sensor;
     private SensorEventListener castLineSensorListener;
     private SensorEventListener nibblingSensorListener;
+    private SensorEventListener reelingSensorListener;
+    private Sensor lightSensor;
+    private SensorEventListener sensorEventListener;
 
     Timer timer;
 
@@ -36,7 +39,9 @@ public class FishingGame extends AppCompatActivity {
     private MediaPlayer ambientPlayer;
     private MediaPlayer lowBubblePlayer;
     private MediaPlayer loudBubblePlayer;
+    private MediaPlayer reelPlayer;
     private MediaPlayer exclamationsPlayer;
+    private int reelDistance;
 
     private int[] exclamations = new int[] {R.raw.ohyeah, R.raw.thatsanicefish, R.raw.woohoo};
 
@@ -59,13 +64,17 @@ public class FishingGame extends AppCompatActivity {
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
+        lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+
         castLineSensorListener = new CastLineSensorListener();
         nibblingSensorListener = new FishNibblingSensorListener();
+        reelingSensorListener = new ReelingSensorListener();
 
 
         castLinePlayer = MediaPlayer.create(this, R.raw.fishing_splash);
         lowBubblePlayer = MediaPlayer.create(this, R.raw.low_instensity_bubbles);
         loudBubblePlayer = MediaPlayer.create(this, R.raw.bubble);
+        reelPlayer = MediaPlayer.create(this, R.raw.reel);
         exclamationsPlayer = MediaPlayer.create(this, exclamations[new Random().nextInt(exclamations.length)]);
 
         background = findViewById(R.id.horizon);
@@ -81,7 +90,6 @@ public class FishingGame extends AppCompatActivity {
         timer = new Timer();
 
         sensorManager.registerListener(castLineSensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
-
 
     }
 
@@ -163,6 +171,11 @@ public class FishingGame extends AppCompatActivity {
         vibrator.cancel();
     }
 
+    private void reeling() {
+        sensorManager.unregisterListener(reelingSensorListener);
+        sensorManager.registerListener(reelingSensorListener, lightSensor, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
     private void vibrationGoesCrazy() {
         long[] timings = new long[]{50, 50, 50, 50, 50, 100, 350, 25, 25, 25, 25, 200};
         int[] amplitudes = new int[]{33, 51, 75, 113, 170, 255, 0, 38, 62, 100, 160, 255};
@@ -198,6 +211,30 @@ public class FishingGame extends AppCompatActivity {
         });
     }
 
+    public void startReeling(){
+        reelPlayer.start(); //markera att fisken ska reelas in - wip
+        Random rand = new Random();
+        int minDistance = 100;
+        int maxDistance = 500;
+        reelDistance = rand.nextInt(maxDistance - minDistance) + minDistance;
+        reeling();
+    }
+
+    private void reelSound(){
+        if (reelPlayer.isPlaying()) {
+            reelPlayer.stop();
+            reelPlayer.start();
+        } else {
+            reelPlayer.start();
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator.cancel();
+            vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
+        }
+
+    }
+
     class CastLineSensorListener implements SensorEventListener {
 
         @Override
@@ -222,8 +259,33 @@ public class FishingGame extends AppCompatActivity {
         public void onSensorChanged(SensorEvent event) {
             float z = event.values[2];
             if (z < -2) {
-                caughtFish();
+                startReeling();
             }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+        }
+    }
+
+    class ReelingSensorListener implements SensorEventListener {
+
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+
+                if (event.values[0] >= 0 && event.values[0] <= 10) {
+                    if(reelDistance > 0){
+                        reelDistance -= 50;
+                        reelSound();
+                    } else {
+                        caughtFish();
+                    }
+
+                } else {
+                    //maybe some reeling tutorial animation
+                }
+
         }
 
         @Override
