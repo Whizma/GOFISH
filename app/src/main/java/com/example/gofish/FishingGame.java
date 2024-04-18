@@ -14,6 +14,7 @@ import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.view.View;
@@ -39,9 +40,7 @@ public class FishingGame extends AppCompatActivity {
 
     private float currentRotation;
 
-    Timer timer;
-
-    ImageView fish;
+    private Timer timer;
 
     private MediaPlayer castLinePlayer;
     private MediaPlayer ambientPlayer;
@@ -123,6 +122,8 @@ public class FishingGame extends AppCompatActivity {
         castLinePlayer.release();
         lowBubblePlayer.release();
         loudBubblePlayer.release();
+        reelPlayer.release();
+        exclamationsPlayer.release();
         vibrator.cancel();
     }
 
@@ -169,7 +170,7 @@ public class FishingGame extends AppCompatActivity {
                 sensorManager.unregisterListener(nibblingSensorListener);
                 sensorManager.registerListener(castLineSensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
                 vibrator.cancel();
-                rod.setRotationX(180);
+                rod.setRotationX(0);
             }
         }, 5000);
     }
@@ -182,15 +183,16 @@ public class FishingGame extends AppCompatActivity {
         ObjectAnimator fadeIn = ObjectAnimator.ofFloat(fish, "alpha", 0f, 1f);
         ObjectAnimator fadeOut = ObjectAnimator.ofFloat(fish, "alpha", 1f, 0f);
 
-        vibrationGoesCrazy();
-        startRotation();
+        //wip
+        //vibrationGoesCrazy();
+        //startRotation();
 
         fadeIn.setDuration(1000); // Adjust the duration as per your preference
         fadeOut.setDuration(500); // Adjust the duration as per your preference
 
 
         // Start the animation
-       // fadeIn.start();
+       fadeIn.start();
 
         vibrator.cancel();
 
@@ -275,6 +277,7 @@ public class FishingGame extends AppCompatActivity {
                 break;
             case "beach":
                 ambientPlayer = MediaPlayer.create(this, R.raw.beach);
+                ambientPlayer.setVolume(0.5f, 0.5f);
                 break;
             case "dock":
                 ambientPlayer = MediaPlayer.create(this, R.raw.dock);
@@ -347,10 +350,10 @@ public class FishingGame extends AppCompatActivity {
         public void onSensorChanged(SensorEvent event) {
             float z = event.values[2];
             if (z < -2) {
-                if (timer != null) {
-                    timer.cancel(); // Cancel the TimerTask if it's not null
-                }
+                timer.cancel(); // Cancel the TimerTask if it's not null
+                //wip - ändras efter testning
                 startReeling();
+
             }
         }
 
@@ -361,30 +364,36 @@ public class FishingGame extends AppCompatActivity {
     }
 
     class ReelingSensorListener implements SensorEventListener {
+        private boolean isReeling = false;
 
         @Override
         public void onSensorChanged(SensorEvent event) {
-
-                if (event.values[0] >= 0 && event.values[0] <= 8) {
-                    if(reelDistance > 0){
-                        reelDistance -= 50;
-                        reelSound();
-                    } else {
-                        gesture.setAlpha(0);
-                        caughtFish();
-                    }
+            if (!isReeling && event.values[0] >= 0 && event.values[0] <= 9) {
+                isReeling = true;
+                reelDistance -= 50;
+                reelSound();
+                if (reelDistance > 0) {
 
                 } else {
-                    //maybe some reeling tutorial animation
-                    //text.setAlpha(1f);
+                    gesture.setAlpha(0);
+                    caughtFish();
                 }
 
+                // Reset the flag after a short delay to allow the method to be triggered again
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        isReeling = false;
+                    }
+                }, 500); // Adjust the delay time (in milliseconds) as needed
+            }
         }
 
         @Override
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
+            // Not needed for this example, but you may need to implement it depending on your requirements
         }
     }
+
 }
 
