@@ -34,6 +34,18 @@
         app:srcCompat="@drawable/fishing_rod" />
 
     <ImageView
+        android:id="@+id/gesture"
+        android:layout_width="247dp"
+        android:layout_height="344dp"
+        android:layout_marginBottom="200dp"
+        android:rotation="270"
+        app:layout_constraintBottom_toBottomOf="@+id/horizon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/gesture" />
+
+    <ImageView
         android:id="@+id/fish"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -43,12 +55,15 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/fish_look" />
 
-    <TextView
-        android:id="@+id/reelGuide"
+    <Button
+        android:id="@+id/restart"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"
-        tools:layout_editor_absoluteX="173dp"
-        tools:layout_editor_absoluteY="49dp" />
+        android:layout_marginTop="550dp"
+        android:text="Collect Fish"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/horizon" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

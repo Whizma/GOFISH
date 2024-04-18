@@ -14,7 +14,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.util.Random;
 import java.util.Timer;
@@ -50,6 +53,8 @@ public class FishingGame extends AppCompatActivity {
     private ImageView rod;
     private ImageView background;
     private ImageView ocean;
+    private ImageView gesture;
+    private Button restart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,11 +88,17 @@ public class FishingGame extends AppCompatActivity {
 
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
+        //connecting xml elements
         rod = findViewById(R.id.rod);
         fish = findViewById(R.id.fish);
         fish.setAlpha(0f);
+        gesture = findViewById(R.id.gesture);
+        gesture.setAlpha(0f);
+        restart = findViewById(R.id.restart);
+        restart.setVisibility(View.INVISIBLE);
+        restart.setEnabled(false);
 
-        timer = new Timer();
+        //timer = new Timer(); //hade problem med denna
 
         sensorManager.registerListener(castLineSensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
 
@@ -111,7 +122,7 @@ public class FishingGame extends AppCompatActivity {
         int delay = rand.nextInt(maxDelay - minDelay) + minDelay;
 
         lowBubblePlayer.start();
-
+        timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -138,7 +149,7 @@ public class FishingGame extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             vibrator.vibrate(VibrationEffect.createWaveform(timings, amplitudes, repeatIndex));
         }
-
+        timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -146,33 +157,45 @@ public class FishingGame extends AppCompatActivity {
                 sensorManager.unregisterListener(nibblingSensorListener);
                 sensorManager.registerListener(castLineSensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
                 vibrator.cancel();
-                rod.setRotationX(0);
+                rod.setRotationX(180);
             }
         }, 5000);
     }
 
     private void caughtFish() {
-        ambientPlayer.stop();
+        //ambientPlayer.stop(); //varför?
         exclamationsPlayer.start();
 
-        sensorManager.unregisterListener(nibblingSensorListener);
-        sensorManager.registerListener(castLineSensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
-
+        sensorManager.unregisterListener(reelingSensorListener);
         ObjectAnimator fadeIn = ObjectAnimator.ofFloat(fish, "alpha", 0f, 1f);
         ObjectAnimator fadeOut = ObjectAnimator.ofFloat(fish, "alpha", 1f, 0f);
 
         fadeIn.setDuration(1000); // Adjust the duration as per your preference
         fadeOut.setDuration(500); // Adjust the duration as per your preference
 
-
         // Start the animation
         fadeIn.start();
 
         vibrator.cancel();
+
+        //knapp som startar om
+        restart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rod.setRotationX(0);
+                sensorManager.registerListener(castLineSensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+                restart.setVisibility(View.INVISIBLE);
+                restart.setEnabled(false);
+                fadeOut.start();
+            }
+        });
+        restart.setVisibility(View.VISIBLE);
+        restart.setEnabled(true);
+
     }
 
     private void reeling() {
-        sensorManager.unregisterListener(reelingSensorListener);
+        sensorManager.unregisterListener(nibblingSensorListener);
         sensorManager.registerListener(reelingSensorListener, lightSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
@@ -212,18 +235,26 @@ public class FishingGame extends AppCompatActivity {
     }
 
     public void startReeling(){
-        reelPlayer.start(); //markera att fisken ska reelas in - wip
+        reelPlayer.start(); //markera att fisken ska reelas in - wip - ska ändras
         Random rand = new Random();
-        int minDistance = 100;
-        int maxDistance = 500;
+        int minDistance = 150;
+        int maxDistance = 250;
         reelDistance = rand.nextInt(maxDistance - minDistance) + minDistance;
+        gesture.setAlpha(1f);
         reeling();
     }
 
     private void reelSound(){
         if (reelPlayer.isPlaying()) {
+            // If reelPlayer is already playing, stop it and play again
             reelPlayer.stop();
-            reelPlayer.start();
+            reelPlayer.prepareAsync(); // Prepare the player asynchronously
+            reelPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    mp.start(); // Start playing again once prepared
+                }
+            });
         } else {
             reelPlayer.start();
         }
@@ -259,6 +290,9 @@ public class FishingGame extends AppCompatActivity {
         public void onSensorChanged(SensorEvent event) {
             float z = event.values[2];
             if (z < -2) {
+                if (timer != null) {
+                    timer.cancel(); // Cancel the TimerTask if it's not null
+                }
                 startReeling();
             }
         }
@@ -274,16 +308,18 @@ public class FishingGame extends AppCompatActivity {
         @Override
         public void onSensorChanged(SensorEvent event) {
 
-                if (event.values[0] >= 0 && event.values[0] <= 10) {
+                if (event.values[0] >= 0 && event.values[0] <= 8) {
                     if(reelDistance > 0){
                         reelDistance -= 50;
                         reelSound();
                     } else {
+                        gesture.setAlpha(0);
                         caughtFish();
                     }
 
                 } else {
                     //maybe some reeling tutorial animation
+                    //text.setAlpha(1f);
                 }
 
         }
