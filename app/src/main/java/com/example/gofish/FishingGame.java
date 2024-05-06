@@ -50,6 +50,7 @@ public class FishingGame extends AppCompatActivity {
     private MediaPlayer linebreakPlayer;
     private boolean failed;
     private int reelDistance;
+    private boolean warningVibrationOn;
 
     private int[] exclamations = new int[] {R.raw.ohyeah, R.raw.thatsanicefish, R.raw.woohoo};
 
@@ -79,6 +80,7 @@ public class FishingGame extends AppCompatActivity {
         failed = false;
         random = new Random();
         escapingFish = false;
+        warningVibrationOn = false;
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
@@ -356,26 +358,34 @@ public class FishingGame extends AppCompatActivity {
                 // timer to randomly introduce fish escape
                 //sensorManager.registerListener(castLineSensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
                 //soundplayer med rod tension, och vibration
-                escapingFish = true;
-                stopGesture.setAlpha(1f);
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     vibrator.cancel();
-                    vibrator.vibrate(VibrationEffect.createOneShot(3000, VibrationEffect.DEFAULT_AMPLITUDE));
+                    vibrator.vibrate(VibrationEffect.createOneShot(4000, VibrationEffect.DEFAULT_AMPLITUDE)); //användare har 1 sek på sig att reagera, kan höja o sänka beroende på fisk
                 }
-
-                // Cancel the timer after 3 seconds
-                innerTimer = new Timer();
-
-                innerTimer.schedule(new TimerTask() {
+                warningVibrationOn = true;
+                Timer secondTimer = new Timer();
+                secondTimer.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        escapingFish = false;
-                        stopGesture.setAlpha(0f);
-                        // You might want to add any additional logic here if needed
-                        startFishTimer();
+                        escapingFish = true;
+                        stopGesture.setAlpha(1f);
+                        innerTimer = new Timer();
+
+                        innerTimer.schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                escapingFish = false;
+                                stopGesture.setAlpha(0f);
+                                // You might want to add any additional logic here if needed
+                                warningVibrationOn = false;
+                                startFishTimer();
+
+                            }
+                        }, 3000); // 3000 milliseconds = 3 seconds
                     }
-                }, 3000); // 3000 milliseconds = 3 seconds
+                }, 1000);
+
             }
         }, randomTime);
     }
@@ -409,7 +419,7 @@ public class FishingGame extends AppCompatActivity {
             reelPlayer.start();
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !warningVibrationOn) {
             vibrator.cancel();
             vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
         }
