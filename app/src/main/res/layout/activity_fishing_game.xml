@@ -66,4 +66,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/horizon" />
 
+    <TextView
+        android:id="@+id/fishInfo"
+        android:layout_width="205dp"
+        android:layout_height="106dp"
+        android:layout_marginTop="400dp"
+        android:background="#7073AADA"
+        android:gravity="center"
+        android:text="hello"
+        android:textColor="#020722"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/restart"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
