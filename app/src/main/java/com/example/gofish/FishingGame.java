@@ -19,9 +19,7 @@ import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.view.View;
 import android.widget.Button;
-import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import java.util.Random;
 import java.util.Timer;
@@ -41,6 +39,7 @@ public class FishingGame extends AppCompatActivity {
     private float currentRotation;
 
     private Timer timer;
+    private Timer innerTimer; // Declare innerTimer as a member variable
 
     private MediaPlayer castLinePlayer;
     private MediaPlayer ambientPlayer;
@@ -48,6 +47,8 @@ public class FishingGame extends AppCompatActivity {
     private MediaPlayer loudBubblePlayer;
     private MediaPlayer reelPlayer;
     private MediaPlayer exclamationsPlayer;
+    private MediaPlayer linebreakPlayer;
+    private boolean failed;
     private int reelDistance;
 
     private int[] exclamations = new int[] {R.raw.ohyeah, R.raw.thatsanicefish, R.raw.woohoo};
@@ -61,7 +62,9 @@ public class FishingGame extends AppCompatActivity {
     private ImageView fish;
     private ImageView ocean;
     private ImageView gesture;
+    private ImageView stopGesture;
     private Button restart;
+    private Boolean escapingFish;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +76,9 @@ public class FishingGame extends AppCompatActivity {
             location = intent.getStringExtra("location");
         }
 
+        failed = false;
         random = new Random();
+        escapingFish = false;
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
@@ -84,12 +89,7 @@ public class FishingGame extends AppCompatActivity {
         nibblingSensorListener = new FishNibblingSensorListener();
         reelingSensorListener = new ReelingSensorListener();
 
-
-        castLinePlayer = MediaPlayer.create(this, R.raw.fishing_splash);
-        lowBubblePlayer = MediaPlayer.create(this, R.raw.low_instensity_bubbles);
-        loudBubblePlayer = MediaPlayer.create(this, R.raw.bubble);
-        reelPlayer = MediaPlayer.create(this, R.raw.reel);
-        exclamationsPlayer = MediaPlayer.create(this, exclamations[new Random().nextInt(exclamations.length)]);
+        initializeMediaPlayers();
 
         background = findViewById(R.id.horizon);
 
@@ -103,6 +103,8 @@ public class FishingGame extends AppCompatActivity {
         fish.setAlpha(0f);
         gesture = findViewById(R.id.gesture);
         gesture.setAlpha(0f);
+        stopGesture = findViewById(R.id.stopGesture);
+        stopGesture.setAlpha(0f);
         restart = findViewById(R.id.restart);
         restart.setVisibility(View.INVISIBLE);
         restart.setEnabled(false);
@@ -114,6 +116,36 @@ public class FishingGame extends AppCompatActivity {
         sensorManager.registerListener(castLineSensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
+    private void initializeMediaPlayers() {
+        castLinePlayer = MediaPlayer.create(this, R.raw.fishing_splash);
+        lowBubblePlayer = MediaPlayer.create(this, R.raw.low_instensity_bubbles);
+        loudBubblePlayer = MediaPlayer.create(this, R.raw.bubble);
+        reelPlayer = MediaPlayer.create(this, R.raw.reel);
+        exclamationsPlayer = MediaPlayer.create(this, exclamations[new Random().nextInt(exclamations.length)]);
+        linebreakPlayer = MediaPlayer.create(this, R.raw.fail);
+    }
+
+    private void onReset() {
+        castLinePlayer.release();
+        lowBubblePlayer.release();
+        loudBubblePlayer.release();
+        reelPlayer.release();
+        exclamationsPlayer.release();
+        linebreakPlayer.release();
+        vibrator.cancel();
+        cancelFishTimer();
+
+        initializeMediaPlayers();
+
+        gesture.setAlpha(0);
+        if (failed) {
+            linebreakPlayer.start();
+        }
+        escapingFish = false;
+        rod.setRotationX(0);
+        sensorManager.registerListener(castLineSensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+        failed = false;
+    }
 
     @Override
     protected void onDestroy() {
@@ -124,7 +156,9 @@ public class FishingGame extends AppCompatActivity {
         loudBubblePlayer.release();
         reelPlayer.release();
         exclamationsPlayer.release();
+        linebreakPlayer.release();
         vibrator.cancel();
+        cancelFishTimer();
     }
 
     private void waitForFish() {
@@ -167,16 +201,16 @@ public class FishingGame extends AppCompatActivity {
             @Override
             public void run() {
                 // Failed to catch fish
+                failed = true;
                 sensorManager.unregisterListener(nibblingSensorListener);
-                sensorManager.registerListener(castLineSensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
-                vibrator.cancel();
-                rod.setRotationX(0);
+                onReset();
             }
         }, 5000);
     }
 
     private void caughtFish() {
-        //ambientPlayer.stop(); //varför?
+
+        cancelFishTimer();
         exclamationsPlayer.start();
 
         sensorManager.unregisterListener(reelingSensorListener);
@@ -304,6 +338,56 @@ public class FishingGame extends AppCompatActivity {
         reeling();
     }
 
+
+    private void startFishTimer(){
+        Random rand = new Random();
+        int minTime = 3000;
+        int maxTime = 10000;
+        int randomTime = rand.nextInt(maxTime - minTime) + minTime;
+
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                // timer to randomly introduce fish escape
+                sensorManager.registerListener(castLineSensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+                //soundplayer med rod tension, och vibration
+                escapingFish = true;
+                stopGesture.setAlpha(1f);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator.cancel();
+                    vibrator.vibrate(VibrationEffect.createOneShot(3000, VibrationEffect.DEFAULT_AMPLITUDE));
+                }
+
+                // Schedule a task to set tiredFish back to false after 5 seconds
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        escapingFish = false;
+                        stopGesture.setAlpha(0f);
+                        // You might want to add any additional logic here if needed
+                        startFishTimer();
+                    }
+                }, 3000); // 5000 milliseconds = 5 seconds
+            }
+        }, randomTime);
+    }
+
+
+    // Method to cancel the fish timer
+    private void cancelFishTimer() {
+        if (timer != null) {
+            timer.cancel();
+        }
+        if (innerTimer != null) {
+            innerTimer.cancel();
+        }
+    }
+
+
+
+
     private void reelSound(){
         if (reelPlayer.isPlaying()) {
             // If reelPlayer is already playing, stop it and play again
@@ -350,9 +434,11 @@ public class FishingGame extends AppCompatActivity {
         public void onSensorChanged(SensorEvent event) {
             float z = event.values[2];
             if (z < -2) {
-                timer.cancel(); // Cancel the TimerTask if it's not null
-                //wip - ändras efter testning
+                timer.cancel();
+                startFishTimer();
                 startReeling();
+
+
 
             }
         }
@@ -368,7 +454,7 @@ public class FishingGame extends AppCompatActivity {
 
         @Override
         public void onSensorChanged(SensorEvent event) {
-            if (!isReeling && event.values[0] >= 0 && event.values[0] <= 9) {
+            if (!isReeling && event.values[0] >= 0 && event.values[0] <= 9 && !escapingFish) {
                 isReeling = true;
                 reelDistance -= 50;
                 reelSound();
@@ -386,6 +472,11 @@ public class FishingGame extends AppCompatActivity {
                         isReeling = false;
                     }
                 }, 500); // Adjust the delay time (in milliseconds) as needed
+            } else if (!isReeling && event.values[0] >= 0 && event.values[0] <= 9 && escapingFish) {
+
+                failed = true;
+                sensorManager.unregisterListener(reelingSensorListener);
+                onReset();
             }
         }
 

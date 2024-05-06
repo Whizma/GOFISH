@@ -46,6 +46,20 @@
         app:srcCompat="@drawable/gesture" />
 
     <ImageView
+        android:id="@+id/stopGesture"
+        android:layout_width="243dp"
+        android:layout_height="290dp"
+        android:layout_marginBottom="50dp"
+        android:rotation="270"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.299"
+        app:srcCompat="@drawable/stopgesture" />
+
+    <ImageView
         android:id="@+id/fish"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
