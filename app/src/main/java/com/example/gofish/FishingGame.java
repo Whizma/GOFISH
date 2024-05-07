@@ -353,7 +353,7 @@ public class FishingGame extends AppCompatActivity {
         Random rand = new Random();
         int minDistance = 150;
         int maxDistance = 250;
-        reelDistance = (int)(fish.getWeight()*10) + rand.nextInt(maxDistance - minDistance) + minDistance;
+        reelDistance = (int)(fish.getWeight()*30) + rand.nextInt(maxDistance - minDistance) + minDistance;
         gesture.setAlpha(1f);
         reeling();
     }
@@ -363,8 +363,8 @@ public class FishingGame extends AppCompatActivity {
 
     private void startFishTimer() {
         Random rand = new Random();
-        int minTime = 1000;
-        int maxTime = 10000;
+        int minTime = 500;
+        int maxTime = 8000;
         int randomTime = rand.nextInt(maxTime - minTime) + minTime;
 
         timer = new Timer();
@@ -377,7 +377,7 @@ public class FishingGame extends AppCompatActivity {
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     vibrator.cancel();
-                    vibrator.vibrate(VibrationEffect.createOneShot(4000, VibrationEffect.DEFAULT_AMPLITUDE)); //användare har 1 sek på sig att reagera, kan höja o sänka beroende på fisk
+                    vibrator.vibrate(VibrationEffect.createOneShot(8000-(int)(150*fish.getWeight()), VibrationEffect.DEFAULT_AMPLITUDE)); //användare har 1 sek på sig att reagera, kan höja o sänka beroende på fisk
                 }
                 warningVibrationOn = true;
                 Timer secondTimer = new Timer();
@@ -400,7 +400,7 @@ public class FishingGame extends AppCompatActivity {
                             }
                         }, 3000); // 3000 milliseconds = 3 seconds
                     }
-                }, 1000);
+                }, 5000-(int)(150*fish.getWeight()));
 
             }
         }, randomTime);
