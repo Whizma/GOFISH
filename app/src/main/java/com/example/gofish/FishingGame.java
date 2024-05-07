@@ -20,7 +20,9 @@ import android.os.Vibrator;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
+import java.util.Locale;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -60,12 +62,15 @@ public class FishingGame extends AppCompatActivity {
 
     private ImageView rod;
     private ImageView background;
-    private ImageView fish;
+    private ImageView fishImage;
+    private TextView fishInfo;
     private ImageView ocean;
     private ImageView gesture;
     private ImageView stopGesture;
     private Button restart;
     private Boolean escapingFish;
+
+    private Fish fish;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,12 +102,17 @@ public class FishingGame extends AppCompatActivity {
 
         chosenLocation(location);
 
+        fish = new Fish(location);
+
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         //connecting xml elements
         rod = findViewById(R.id.rod);
-        fish = findViewById(R.id.fish);
-        fish.setAlpha(0f);
+        fishImage = findViewById(R.id.fish);
+        fishImage.setImageResource(fish.getImageResource());
+        fishImage.setAlpha(0f);
+        fishInfo = findViewById(R.id.fishInfo);
+        fishInfo.setAlpha(0f);
         gesture = findViewById(R.id.gesture);
         gesture.setAlpha(0f);
         stopGesture = findViewById(R.id.stopGesture);
@@ -218,8 +228,8 @@ public class FishingGame extends AppCompatActivity {
         exclamationsPlayer.start();
 
         sensorManager.unregisterListener(reelingSensorListener);
-        ObjectAnimator fadeIn = ObjectAnimator.ofFloat(fish, "alpha", 0f, 1f);
-        ObjectAnimator fadeOut = ObjectAnimator.ofFloat(fish, "alpha", 1f, 0f);
+        ObjectAnimator fadeIn = ObjectAnimator.ofFloat(fishImage, "alpha", 0f, 1f);
+        ObjectAnimator fadeOut = ObjectAnimator.ofFloat(fishImage, "alpha", 1f, 0f);
 
         //wip
         //vibrationGoesCrazy();
@@ -234,6 +244,9 @@ public class FishingGame extends AppCompatActivity {
 
         vibrator.cancel();
 
+        fishInfo.setAlpha(1f);
+        fishInfo.setText(String.format(Locale.getDefault(),"Congratulations! You caught a %s.\n It weighs %.1f kg!", fish.getName(), fish.getWeight()));
+
         //knapp som startar om
         restart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -241,7 +254,10 @@ public class FishingGame extends AppCompatActivity {
 
                 restart.setVisibility(View.INVISIBLE);
                 restart.setEnabled(false);
+                fishInfo.setText("");
+                fishInfo.setAlpha(0f);
                 fadeOut.start();
+                fish = new Fish(location);
                 onReset();
             }
         });
@@ -337,7 +353,7 @@ public class FishingGame extends AppCompatActivity {
         Random rand = new Random();
         int minDistance = 150;
         int maxDistance = 250;
-        reelDistance = rand.nextInt(maxDistance - minDistance) + minDistance;
+        reelDistance = (int)(fish.getWeight()*10) + rand.nextInt(maxDistance - minDistance) + minDistance;
         gesture.setAlpha(1f);
         reeling();
     }
