@@ -13,6 +13,7 @@ android:orientation="vertical">
     android:textStyle="bold"
     android:fontFamily="@font/racing_sans_one"
     android:text="Beach"
+    android:gravity="center"
     />
 
 <TextView
@@ -20,8 +21,9 @@ android:orientation="vertical">
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:textColor="@color/white"
-    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
     android:text="The beach is a lovely place for fishing"
+    android:gravity="center"
     />
 
 <ImageView
