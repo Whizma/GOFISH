@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.view.View;
@@ -63,6 +64,8 @@ public class FishingGame extends AppCompatActivity {
     private ImageView gesture;
     private Button restart;
 
+    private Button map;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,7 +89,7 @@ public class FishingGame extends AppCompatActivity {
 
 
         castLinePlayer = MediaPlayer.create(this, R.raw.fishing_splash);
-        lowBubblePlayer = MediaPlayer.create(this, R.raw.low_instensity_bubbles);
+        lowBubblePlayer = MediaPlayer.create(this, R.raw.low_instensity_bubble);
         loudBubblePlayer = MediaPlayer.create(this, R.raw.bubble);
         reelPlayer = MediaPlayer.create(this, R.raw.reel);
         exclamationsPlayer = MediaPlayer.create(this, exclamations[new Random().nextInt(exclamations.length)]);
@@ -108,6 +111,16 @@ public class FishingGame extends AppCompatActivity {
         restart.setEnabled(false);
 
         //timer = new Timer(); //hade problem med denna
+
+        Button map = findViewById(R.id.map);
+        map.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Create an intent to navigate back to the map activity
+                Intent intent = new Intent(FishingGame.this, Map.class);
+                startActivity(intent);
+            }
+        });
 
         currentRotation = 0;
 
@@ -132,7 +145,6 @@ public class FishingGame extends AppCompatActivity {
         int minDelay = 5000;
         int maxDelay = 10000;
         int delay = rand.nextInt(maxDelay - minDelay) + minDelay;
-
         lowBubblePlayer.start();
         timer = new Timer();
         timer.schedule(new TimerTask() {
@@ -176,7 +188,7 @@ public class FishingGame extends AppCompatActivity {
     }
 
     private void caughtFish() {
-        //ambientPlayer.stop(); //varför?
+//        ambientPlayer.stop(); //varför?
         exclamationsPlayer.start();
 
         sensorManager.unregisterListener(reelingSensorListener);
@@ -271,17 +283,17 @@ public class FishingGame extends AppCompatActivity {
     private void chosenLocation(String location) {
 
         switch (location) {
-            case "lake":
+            case "Lake":
                 ambientPlayer = MediaPlayer.create(this, R.raw.ambient_lake);
-                background.setImageResource(R.drawable.lake);
+                background.setImageResource(R.drawable.lake2);
                 break;
-            case "beach":
+            case "Beach":
                 ambientPlayer = MediaPlayer.create(this, R.raw.beach);
                 ambientPlayer.setVolume(0.5f, 0.5f);
                 break;
-            case "dock":
+            case "Dock":
                 ambientPlayer = MediaPlayer.create(this, R.raw.dock);
-                background.setImageResource(R.drawable.dockbg);
+                background.setImageResource(R.drawable.dock2);
                 break;
         }
 
