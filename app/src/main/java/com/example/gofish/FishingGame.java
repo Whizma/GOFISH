@@ -61,6 +61,7 @@ public class FishingGame extends AppCompatActivity {
     private ImageView background;
     private ImageView fishImage;
     private TextView fishInfo;
+    private ImageView redBorder;
     private ImageView ocean;
     private ImageView gesture;
     private Button restart;
@@ -104,6 +105,8 @@ public class FishingGame extends AppCompatActivity {
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         //connecting xml elements
+        redBorder = findViewById(R.id.redBorder);
+        redBorder.setAlpha(0f);
         rod = findViewById(R.id.rod);
         fishImage = findViewById(R.id.fish);
         fishImage.setImageResource(fish.getImageResource());
