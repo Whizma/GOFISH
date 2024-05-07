@@ -31,7 +31,7 @@ public class Map extends AppCompatActivity {
         dockButton = (ImageButton) findViewById(R.id.dock);
         lakeButton = (ImageButton) findViewById(R.id.lake);
         beachInfo = "The dock is a great starting point for catching your first fish, the friendly Perch";
-        dockInfo = "Continue your fishing journey at the beach, and try to catch the elusive Brown Trout;
+        dockInfo = "Continue your fishing journey at the beach, and try to catch the elusive Brown Trout";
         lakeInfo = "Let any fish who meets your gaze learn the true meaning of fear; for you are the harbinger of death. The bane of creatures sub-aqueous, your rod is true and unwavering as you cast into the aquatic abyss. A man, scorned by this uncaring Earth, finds solace in the sea. Your only friend, the worm upon my hook. Wriggling, writhing, struggling to surmount the mortal pointlessness that permeates this barren world. You am alone. You  am empty. And yet, You fish. Beware of the lake, and beware of the ole mighty GammelGäddan";
 
 
