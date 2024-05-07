@@ -33,7 +33,7 @@ public class Map extends AppCompatActivity {
         lakeButton = (ImageButton) findViewById(R.id.lake);
         beachInfo = "The beach is a great starting point for catching your first fish, the friendly Perch";
         dockInfo = "Continue your fishing journey at the dock, and try to catch the elusive Brown Trout";
-        lakeInfo = "Let any fish who meets your gaze learn the true meaning of fear; for you are the harbinger of death. The bane of creatures sub-aqueous, your rod is true and unwavering as you cast into the aquatic abyss. A man, scorned by this uncaring Earth, finds solace in the sea. Your only friend, the worm upon my hook. Wriggling, writhing, struggling to surmount the mortal pointlessness that permeates this barren world. You am alone. You  am empty. And yet, You fish. Beware of the lake, and beware of the ole mighty GammelGäddan";
+        lakeInfo = "Let any fish who meets your gaze learn the true meaning of fear; for you are the harbinger of death. The bane of creatures sub-aqueous, your rod is true and unwavering as you cast into the aquatic abyss. You, scorned by this uncaring Earth, finds solace in the sea. Your only friend, the worm upon your hook. Wriggling, writhing, struggling to surmount the mortal pointlessness that permeates this barren world. You are alone. You are empty. And yet, You fish. Beware of the lake, and beware of the ole mighty GammelGäddan";
 
         beachButton.setOnClickListener(new OnLocationClickListener("Beach", beachInfo, R.drawable.beach_popup2));
         dockButton.setOnClickListener(new OnLocationClickListener("Dock", dockInfo, R.drawable.dock_popup2));
