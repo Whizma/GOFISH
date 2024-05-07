@@ -18,6 +18,11 @@ public class Map extends AppCompatActivity {
     private ImageButton dockButton;
     private ImageButton lakeButton;
 
+    private String beachInfo;
+    private String dockInfo;
+    private String lakeInfo;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,11 +31,14 @@ public class Map extends AppCompatActivity {
         beachButton = (ImageButton) findViewById(R.id.beach);
         dockButton = (ImageButton) findViewById(R.id.dock);
         lakeButton = (ImageButton) findViewById(R.id.lake);
+        beachInfo = "The dock is a great starting point for catching your first fish, the friendly Perch";
+        dockInfo = "Continue your fishing journey at the beach, and try to catch the elusive Brown Trout";
+        lakeInfo = "Let any fish who meets your gaze learn the true meaning of fear; for you are the harbinger of death. The bane of creatures sub-aqueous, your rod is true and unwavering as you cast into the aquatic abyss. A man, scorned by this uncaring Earth, finds solace in the sea. Your only friend, the worm upon my hook. Wriggling, writhing, struggling to surmount the mortal pointlessness that permeates this barren world. You am alone. You  am empty. And yet, You fish. Beware of the lake, and beware of the ole mighty GammelGäddan";
 
 
-        beachButton.setOnClickListener(new OnLocationClickListener("Beach", "The beach is a locely place for fishing!", R.drawable.beach_popup2));
-        dockButton.setOnClickListener(new OnLocationClickListener("Dock", "Dock Information", R.drawable.dock_popup2));
-        lakeButton.setOnClickListener(new OnLocationClickListener("Lake",  "Lake Information", R.drawable.lake_popup));
+        beachButton.setOnClickListener(new OnLocationClickListener("beach", beachInfo, R.drawable.beach_popup));
+        dockButton.setOnClickListener(new OnLocationClickListener("dock", dockInfo, R.drawable.dock_popup));
+        lakeButton.setOnClickListener(new OnLocationClickListener("lake", lakeInfo, R.drawable.lake_popup));
     }
 
     private void showPopupDialog(final String location, String information, int locationImageId) {
