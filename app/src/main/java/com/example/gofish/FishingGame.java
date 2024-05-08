@@ -82,12 +82,9 @@ public class FishingGame extends AppCompatActivity {
     private void changeLocationState(String location) {
         System.out.println(location);
         if (location.equals("Beach")) {
-            currentState[0] = true;
-        }
-        if (location.equals("Dock")) {
             currentState[1] = true;
         }
-        if (location.equals("Lake")) {
+        if (location.equals("Dock")) {
             currentState[2] = true;
         }
     }
