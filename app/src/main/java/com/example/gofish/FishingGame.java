@@ -49,6 +49,7 @@ public class FishingGame extends AppCompatActivity {
     private MediaPlayer reelPlayer;
     private MediaPlayer exclamationsPlayer;
     private MediaPlayer linebreakPlayer;
+    private MediaPlayer mothuggPlayer;
     private boolean failed;
     private int reelDistance;
     private boolean warningVibrationOn;
@@ -154,6 +155,7 @@ public class FishingGame extends AppCompatActivity {
         lowBubblePlayer = MediaPlayer.create(this, R.raw.low_instensity_bubble);
         loudBubblePlayer = MediaPlayer.create(this, R.raw.bubble);
         reelPlayer = MediaPlayer.create(this, R.raw.reel);
+        mothuggPlayer = MediaPlayer.create(this, R.raw.woosh);
         exclamationsPlayer = MediaPlayer.create(this, exclamations[new Random().nextInt(exclamations.length)]);
         linebreakPlayer = MediaPlayer.create(this, R.raw.fail);
     }
