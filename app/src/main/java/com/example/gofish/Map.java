@@ -26,7 +26,7 @@ public class Map extends AppCompatActivity implements StateChangeListener {
     private int dock = 1;
     private int lake = 2;
 
-    private boolean[] currentState = {true, false, false};
+    public boolean[] currentState = {true, false, false};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,15 +48,12 @@ public class Map extends AppCompatActivity implements StateChangeListener {
     @Override
     public void onStateChange(int index) {
         currentState[index] = true;
-        // Update UI or perform actions based on the new state
     }
 
-    // Method to provide state access to sub-activities if needed
-    public boolean getCurrentState(int index) {
-        return currentState[index];
-    }
+    final Map map = this;
 
     private void showPopupDialog(final String location, String information, int locationImageId) {
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = getLayoutInflater().inflate(R.layout.custom_dialog_layout, null); // Inflate custom dialog layout
         builder.setView(dialogView); // Set custom layout to dialog
@@ -78,6 +75,7 @@ public class Map extends AppCompatActivity implements StateChangeListener {
                         dialog.dismiss(); // Close the dialog
                         Intent intent = new Intent(Map.this, FishingGame.class);
                         intent.putExtra("location", location);
+                        intent.putExtra("currentState", currentState);
                         startActivity(intent);
                     }
                 })

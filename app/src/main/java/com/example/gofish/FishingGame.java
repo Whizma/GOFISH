@@ -1,5 +1,7 @@
 package com.example.gofish;
 
+import static android.app.PendingIntent.getActivity;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -31,6 +33,7 @@ import java.util.TimerTask;
 
 public class FishingGame extends AppCompatActivity {
 
+    private boolean[] currentState;
     private String location;
     private SensorManager sensorManager;
     private Sensor sensor;
@@ -76,6 +79,20 @@ public class FishingGame extends AppCompatActivity {
 
     private Button map;
 
+    private Map mapActivity;
+
+    private void changeLocationState(String location) {
+        if (location.equals("beach")) {
+            currentState[0] = true;
+        }
+        if (location.equals("dock")) {
+            currentState[2] = true;
+        }
+        if (location.equals("beach")) {
+            currentState[3] = true;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,6 +101,10 @@ public class FishingGame extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent != null) {
             location = intent.getStringExtra("location");
+            currentState = intent.getBooleanArrayExtra("currentState");
+            for(int i = 0; i < currentState.length; i++) {
+                System.out.println(currentState[i]);
+            }
         }
 
         failed = false;
@@ -259,7 +280,10 @@ public class FishingGame extends AppCompatActivity {
 
         fishInfo.setAlpha(1f);
         fishInfo.setText(String.format(Locale.getDefault(),"Congratulations! You caught a %s.\n It weighs %.1f kg!", fish.getName(), fish.getWeight()));
-
+        changeLocationState(location);
+        for (int i = 0; i < currentState.length; i++) {
+            System.out.println(currentState[i]);
+        }
         //knapp som startar om
         restart.setOnClickListener(new View.OnClickListener() {
             @Override
