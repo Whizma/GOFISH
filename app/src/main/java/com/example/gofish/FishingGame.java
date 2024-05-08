@@ -1,9 +1,7 @@
 package com.example.gofish;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
@@ -17,10 +15,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -68,8 +64,7 @@ public class FishingGame extends AppCompatActivity {
     private TextView fishInfo;
     private ImageView redBorder;
     private ImageView ocean;
-    private ImageView gesture;
-    private ImageView stopGesture;
+    private ImageView tutorialImage;
     private Button restart;
     private Boolean escapingFish;
 
@@ -120,10 +115,11 @@ public class FishingGame extends AppCompatActivity {
         fishImage.setAlpha(0f);
         fishInfo = findViewById(R.id.fishInfo);
         fishInfo.setAlpha(0f);
-        gesture = findViewById(R.id.gesture);
-        gesture.setAlpha(0f);
-        stopGesture = findViewById(R.id.stopGesture);
-        stopGesture.setAlpha(0f);
+
+        tutorialImage = findViewById(R.id.tutorial);
+        tutorialImage.setImageResource(R.drawable.gesture);
+        tutorialImage.setAlpha(0f);
+
         restart = findViewById(R.id.restart);
         restart.setVisibility(View.INVISIBLE);
         restart.setEnabled(false);
@@ -145,9 +141,16 @@ public class FishingGame extends AppCompatActivity {
         sensorManager.registerListener(castLineSensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
+    protected void onStart() {
+        super.onStart();
+        initializeMediaPlayers();
+        sensorManager.registerListener(castLineSensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+
+    }
+
     private void initializeMediaPlayers() {
         castLinePlayer = MediaPlayer.create(this, R.raw.fishing_splash);
-        lowBubblePlayer = MediaPlayer.create(this, R.raw.low_instensity_bubbles);
+        lowBubblePlayer = MediaPlayer.create(this, R.raw.low_instensity_bubble);
         loudBubblePlayer = MediaPlayer.create(this, R.raw.bubble);
         reelPlayer = MediaPlayer.create(this, R.raw.reel);
         exclamationsPlayer = MediaPlayer.create(this, exclamations[new Random().nextInt(exclamations.length)]);
@@ -167,7 +170,7 @@ public class FishingGame extends AppCompatActivity {
 
         initializeMediaPlayers();
 
-        gesture.setAlpha(0);
+        tutorialImage.setAlpha(0);
         if (failed) {
             linebreakPlayer.start();
         }
@@ -287,47 +290,6 @@ public class FishingGame extends AppCompatActivity {
         sensorManager.registerListener(reelingSensorListener, lightSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
-
-    private void startRotation() {
-        // Increment the rotation angle by 1 degree
-
-        int increment = random.nextInt(31) - 15;
-
-        float amplitude = 10f; // Adjust the amplitude for the sway effect
-        float frequency = 0.1f; // Adjust the frequency for the sway effect
-
-        currentRotation = amplitude * (float) Math.sin(frequency) + increment;
-
-        // Create an ObjectAnimator to animate the rotation
-        ObjectAnimator rotationAnimator = ObjectAnimator.ofFloat(rod, View.ROTATION, currentRotation);
-        rotationAnimator.setDuration(random.nextInt(1400) + 300); // Duration in milliseconds (approximately 60 frames per second)
-        rotationAnimator.start();
-
-        // Repeat the animation by recursively calling startRotation()
-        rotationAnimator.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(@NonNull Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(@NonNull Animator animation) {
-                startRotation();
-            }
-
-
-            @Override
-            public void onAnimationCancel(@NonNull Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(@NonNull Animator animation) {
-
-            }
-        });
-    }
-
     private void vibrationGoesCrazy() {
         long[] timings = new long[]{50, 50, 50, 50, 50, 100, 350, 25, 25, 25, 25, 200};
         int[] amplitudes = new int[]{33, 51, 75, 113, 170, 255, 0, 38, 62, 100, 160, 255};
@@ -369,13 +331,10 @@ public class FishingGame extends AppCompatActivity {
         Random rand = new Random();
         int minDistance = 150;
         int maxDistance = 250;
-        reelDistance = (int)(fish.getWeight()*30) + rand.nextInt(maxDistance - minDistance) + minDistance;
-        gesture.setAlpha(1f);
+        reelDistance = (int)(fish.getWeight()*60) + rand.nextInt(maxDistance - minDistance) + minDistance;
+        tutorialImage.setAlpha(1f);
         reeling();
     }
-
-
-
 
     private void startFishTimer() {
         Random rand = new Random();
@@ -396,23 +355,31 @@ public class FishingGame extends AppCompatActivity {
                     vibrator.vibrate(VibrationEffect.createOneShot(8000-(int)(150*fish.getWeight()), VibrationEffect.DEFAULT_AMPLITUDE)); //användare har 1 sek på sig att reagera, kan höja o sänka beroende på fisk
                 }
                 warningVibrationOn = true;
+                redBorder.setAlpha(0.2f);
+
                 Timer secondTimer = new Timer();
                 secondTimer.schedule(new TimerTask() {
                     @Override
                     public void run() {
                         escapingFish = true;
-                        stopGesture.setAlpha(1f);
+                        runOnUiThread(() -> {
+                            tutorialImage.setImageResource(R.drawable.stopgesture);
+                            tutorialImage.setAlpha(1f);
+                        });
                         innerTimer = new Timer();
+
+                        redBorder.setAlpha(0.5f);
 
                         innerTimer.schedule(new TimerTask() {
                             @Override
                             public void run() {
                                 escapingFish = false;
-                                stopGesture.setAlpha(0f);
+                                runOnUiThread(() -> tutorialImage.setAlpha(0f));
                                 // You might want to add any additional logic here if needed
                                 warningVibrationOn = false;
                                 startFishTimer();
 
+                                redBorder.setAlpha(0f);
                             }
                         }, 3000); // 3000 milliseconds = 3 seconds
                     }
@@ -431,9 +398,13 @@ public class FishingGame extends AppCompatActivity {
         if (innerTimer != null) {
             innerTimer.cancel();
             escapingFish = false;
-            stopGesture.setAlpha(0f);
+            runOnUiThread(() -> tutorialImage.setAlpha(0f));
             innerTimer = null; // Reset the timer reference
         }
+    }
+
+    private void redBorderStart() {
+
     }
 
     private void reelSound(){
@@ -464,10 +435,12 @@ public class FishingGame extends AppCompatActivity {
         public void onSensorChanged(SensorEvent event) {
             float z = event.values[2];
 
-            if (z > 5) {
-                castLinePlayer.start();
+            if (z > 5 || z < -5) {
+                if (castLinePlayer != null) castLinePlayer.start();
                 waitForFish();
             }
+
+
         }
 
         @Override
@@ -482,10 +455,9 @@ public class FishingGame extends AppCompatActivity {
         public void onSensorChanged(SensorEvent event) {
             float z = event.values[2];
             if (z < -2) {
-                timer.cancel();
+                cancelFishTimer();
                 startFishTimer();
                 startReeling();
-
             }
         }
 
@@ -507,7 +479,7 @@ public class FishingGame extends AppCompatActivity {
                 if (reelDistance > 0) {
 
                 } else {
-                    gesture.setAlpha(0);
+                    runOnUiThread(() -> tutorialImage.setAlpha(0));
                     caughtFish();
                 }
 
