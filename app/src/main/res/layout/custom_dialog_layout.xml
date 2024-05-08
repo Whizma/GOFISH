@@ -1,16 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/dialog_image"
+    <TextView
+        android:id="@+id/dialog_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:scaleType="centerInside"
-        android:adjustViewBounds="true"/>
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:text="Beach"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display3"
+        android:textColor="@color/yellow"
+        android:textStyle="bold|italic" />
 
-    <!-- Other views and content for your dialog -->
+<TextView
+    android:id="@+id/dialog_information"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textColor="@color/white"
+    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+    android:text="The beach is a lovely place for fishing"
+    android:gravity="center"
+    />
+
+<ImageView
+    android:id="@+id/dialog_image"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:scaleType="centerInside"
+    android:adjustViewBounds="true"/>
+
 
 </LinearLayout>

@@ -16,7 +16,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/horizon_new" />
+        app:srcCompat="@drawable/beach3" />
 
     <ImageView
         android:id="@+id/rod"
@@ -34,7 +34,7 @@
         app:srcCompat="@drawable/fishing_rod" />
 
     <ImageView
-        android:id="@+id/gesture"
+        android:id="@+id/tutorial"
         android:layout_width="247dp"
         android:layout_height="344dp"
         android:layout_marginBottom="200dp"
@@ -46,27 +46,15 @@
         app:srcCompat="@drawable/gesture" />
 
     <ImageView
-        android:id="@+id/stopGesture"
-        android:layout_width="243dp"
-        android:layout_height="290dp"
-        android:layout_marginBottom="50dp"
-        android:rotation="270"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.299"
-        app:srcCompat="@drawable/stopgesture" />
-
-    <ImageView
         android:id="@+id/fish"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
         app:srcCompat="@drawable/fish_look" />
 
     <Button
@@ -75,6 +63,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="550dp"
         android:text="Collect Fish"
+        android:backgroundTint="@color/popup"
+        android:background="@drawable/rounded_button"
+        android:textColor="@color/white"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -94,5 +86,32 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/map"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Map"
+        android:backgroundTint="@color/popup"
+        android:background="@drawable/rounded_button"
+        android:textColor="@color/yellow"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.049"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/redBorder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:alpha="0.3"
+        android:scaleY="2.7"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/horizon"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/red_border" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

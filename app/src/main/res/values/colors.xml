@@ -6,4 +6,8 @@
     <color name="green">#338243</color>
     <color name="red">#f83539</color>
     <color name="cyan">#2ed1d1</color>
+    <color name="blue">#00BFFF</color>
+    <color name="sea">#0d2a3c</color>
+    <color name="gray">#C0C0C0</color>
+    <color name="popup">#129498</color>
 </resources>
