@@ -129,7 +129,13 @@ public class FishingGame extends AppCompatActivity {
     }
 
     private void initializeMediaPlayers() {
-        castLinePlayer = MediaPlayer.create(this, R.raw.fishing_splash);
+        try {
+            castLinePlayer = MediaPlayer.create(this, R.raw.fishing_splash);
+            // Initialize other MediaPlayer instances
+        } catch (Exception e) {
+            // Handle initialization error
+            e.printStackTrace();
+        }
         lowBubblePlayer = MediaPlayer.create(this, R.raw.low_instensity_bubbles);
         loudBubblePlayer = MediaPlayer.create(this, R.raw.bubble);
         reelPlayer = MediaPlayer.create(this, R.raw.reel);
@@ -173,6 +179,8 @@ public class FishingGame extends AppCompatActivity {
         vibrator.cancel();
         cancelFishTimer();
     }
+
+
 
     private void waitForFish() {
         Random rand = new Random();
@@ -382,6 +390,7 @@ public class FishingGame extends AppCompatActivity {
                 warningVibrationOn = true;
                 Timer secondTimer = new Timer();
                 secondTimer.schedule(new TimerTask() {
+
                     @Override
                     public void run() {
                         escapingFish = true;
@@ -449,7 +458,7 @@ public class FishingGame extends AppCompatActivity {
             float z = event.values[2];
 
             if (z > 5) {
-                castLinePlayer.start();
+                //castLinePlayer.start();
                 waitForFish();
             }
         }
