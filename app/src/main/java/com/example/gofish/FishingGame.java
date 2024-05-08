@@ -40,6 +40,7 @@ public class FishingGame extends AppCompatActivity {
 
     private Timer timer;
     private Timer innerTimer; // Declare innerTimer as a member variable
+    private Timer secondTimer;
 
     private MediaPlayer castLinePlayer;
     private MediaPlayer ambientPlayer;
@@ -159,6 +160,10 @@ public class FishingGame extends AppCompatActivity {
 
     private void onReset() {
         cancelFishTimer();
+        if (secondTimer != null) {
+            secondTimer.cancel();
+            secondTimer = null;
+        }
         castLinePlayer.release();
         lowBubblePlayer.release();
         loudBubblePlayer.release();
@@ -359,7 +364,7 @@ public class FishingGame extends AppCompatActivity {
                 warningVibrationOn = true;
                 redBorder.setAlpha(0.2f);
 
-                Timer secondTimer = new Timer();
+                secondTimer = new Timer();
                 secondTimer.schedule(new TimerTask() {
 
                     @Override
@@ -398,6 +403,7 @@ public class FishingGame extends AppCompatActivity {
             timer.cancel();
             timer = null; // Reset the timer reference
         }
+
         if (innerTimer != null) {
             innerTimer.cancel();
             escapingFish = false;
@@ -495,6 +501,10 @@ public class FishingGame extends AppCompatActivity {
                 }, 500); // Adjust the delay time (in milliseconds) as needed
             } else if (!isReeling && event.values[0] >= 0 && event.values[0] <= 9 && escapingFish) {
                 cancelFishTimer();
+                if (secondTimer != null) {
+                    secondTimer.cancel();
+                    secondTimer = null;
+                }
                 failed = true;
                 sensorManager.unregisterListener(reelingSensorListener);
                 onReset();
