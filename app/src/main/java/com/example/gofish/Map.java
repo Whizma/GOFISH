@@ -11,7 +11,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class Map extends AppCompatActivity {
+public class Map extends AppCompatActivity implements StateChangeListener {
     private ImageView fishMapImage;
 
     private ImageButton beachButton;
@@ -22,6 +22,11 @@ public class Map extends AppCompatActivity {
     private String dockInfo;
     private String lakeInfo;
 
+    private int beach = 0;
+    private int dock = 1;
+    private int lake = 2;
+
+    private boolean[] currentState = {true, false, false};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +43,17 @@ public class Map extends AppCompatActivity {
         beachButton.setOnClickListener(new OnLocationClickListener("Beach", beachInfo, R.drawable.beach_popup2));
         dockButton.setOnClickListener(new OnLocationClickListener("Dock", dockInfo, R.drawable.dock_popup2));
         lakeButton.setOnClickListener(new OnLocationClickListener("Lake", lakeInfo, R.drawable.lake_popup));
+    }
+
+    @Override
+    public void onStateChange(int index) {
+        currentState[index] = true;
+        // Update UI or perform actions based on the new state
+    }
+
+    // Method to provide state access to sub-activities if needed
+    public boolean getCurrentState(int index) {
+        return currentState[index];
     }
 
     private void showPopupDialog(final String location, String information, int locationImageId) {
