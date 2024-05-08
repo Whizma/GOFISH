@@ -80,14 +80,15 @@ public class FishingGame extends AppCompatActivity {
     private Map mapActivity;
 
     private void changeLocationState(String location) {
-        if (location.equals("beach")) {
+        System.out.println(location);
+        if (location.equals("Beach")) {
             currentState[0] = true;
         }
-        if (location.equals("dock")) {
-            currentState[2] = true;
+        if (location.equals("Dock")) {
+            currentState[1] = true;
         }
-        if (location.equals("beach")) {
-            currentState[3] = true;
+        if (location.equals("Lake")) {
+            currentState[2] = true;
         }
     }
 
@@ -290,6 +291,7 @@ public class FishingGame extends AppCompatActivity {
         fishInfo.setAlpha(1f);
         fishInfo.setText(String.format(Locale.getDefault(),"Congratulations! You caught a %s.\n It weighs %.1f kg!", fish.getName(), fish.getWeight()));
         changeLocationState(location);
+        System.out.println("fångad fisk");
         for (int i = 0; i < currentState.length; i++) {
             System.out.println(currentState[i]);
         }
