@@ -127,4 +127,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/redBorder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:alpha="0.3"
+        android:scaleY="2.7"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/horizon"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/red_border" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

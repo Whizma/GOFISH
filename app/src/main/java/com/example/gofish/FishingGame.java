@@ -1,9 +1,10 @@
 package com.example.gofish;
 
+import static android.app.PendingIntent.getActivity;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
@@ -17,10 +18,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -31,6 +30,7 @@ import java.util.TimerTask;
 
 public class FishingGame extends AppCompatActivity {
 
+    private boolean[] currentState;
     private String location;
     private SensorManager sensorManager;
     private Sensor sensor;
@@ -52,6 +52,7 @@ public class FishingGame extends AppCompatActivity {
     private MediaPlayer reelPlayer;
     private MediaPlayer exclamationsPlayer;
     private MediaPlayer linebreakPlayer;
+    private MediaPlayer mothuggPlayer;
     private boolean failed;
     private int reelDistance;
     private boolean warningVibrationOn;
@@ -66,6 +67,7 @@ public class FishingGame extends AppCompatActivity {
     private ImageView background;
     private ImageView fishImage;
     private TextView fishInfo;
+    private ImageView redBorder;
     private ImageView ocean;
     private ImageView reelGestureSpot;
     private ImageView castGestureSpot;
@@ -75,6 +77,18 @@ public class FishingGame extends AppCompatActivity {
     private Fish fish;
 
 
+    private Map mapActivity;
+
+    private void changeLocationState(String location) {
+        System.out.println(location);
+        if (location.equals("Beach")) {
+            currentState[1] = true;
+        }
+        if (location.equals("Dock")) {
+            currentState[2] = true;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +97,10 @@ public class FishingGame extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent != null) {
             location = intent.getStringExtra("location");
+            currentState = intent.getBooleanArrayExtra("currentState");
+            for(int i = 0; i < currentState.length; i++) {
+                System.out.println(currentState[i]);
+            }
         }
 
         failed = false;
@@ -110,6 +128,8 @@ public class FishingGame extends AppCompatActivity {
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         //connecting xml elements
+        redBorder = findViewById(R.id.redBorder);
+        redBorder.setAlpha(0f);
         rod = findViewById(R.id.rod);
         fishImage = findViewById(R.id.fish);
         fishImage.setImageResource(fish.getImageResource());
@@ -134,11 +154,19 @@ public class FishingGame extends AppCompatActivity {
         sensorManager.registerListener(castLineSensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
+    protected void onStart() {
+        super.onStart();
+        initializeMediaPlayers();
+        sensorManager.registerListener(castLineSensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+
+    }
+
     private void initializeMediaPlayers() {
         castLinePlayer = MediaPlayer.create(this, R.raw.fishing_splash);
         lowBubblePlayer = MediaPlayer.create(this, R.raw.low_instensity_bubble);
         loudBubblePlayer = MediaPlayer.create(this, R.raw.bubble);
         reelPlayer = MediaPlayer.create(this, R.raw.reel);
+        mothuggPlayer = MediaPlayer.create(this, R.raw.woosh);
         exclamationsPlayer = MediaPlayer.create(this, exclamations[new Random().nextInt(exclamations.length)]);
         linebreakPlayer = MediaPlayer.create(this, R.raw.fail);
     }
@@ -257,7 +285,11 @@ public class FishingGame extends AppCompatActivity {
 
         fishInfo.setAlpha(1f);
         fishInfo.setText(String.format(Locale.getDefault(),"Congratulations! You caught a %s.\n It weighs %.1f kg!", fish.getName(), fish.getWeight()));
-
+        changeLocationState(location);
+        System.out.println("fångad fisk");
+        for (int i = 0; i < currentState.length; i++) {
+            System.out.println(currentState[i]);
+        }
         //knapp som startar om
         restart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -282,47 +314,6 @@ public class FishingGame extends AppCompatActivity {
     private void reeling() {
         sensorManager.unregisterListener(nibblingSensorListener);
         sensorManager.registerListener(reelingSensorListener, lightSensor, SensorManager.SENSOR_DELAY_NORMAL);
-    }
-
-
-    private void startRotation() {
-        // Increment the rotation angle by 1 degree
-
-        int increment = random.nextInt(31) - 15;
-
-        float amplitude = 10f; // Adjust the amplitude for the sway effect
-        float frequency = 0.1f; // Adjust the frequency for the sway effect
-
-        currentRotation = amplitude * (float) Math.sin(frequency) + increment;
-
-        // Create an ObjectAnimator to animate the rotation
-        ObjectAnimator rotationAnimator = ObjectAnimator.ofFloat(rod, View.ROTATION, currentRotation);
-        rotationAnimator.setDuration(random.nextInt(1400) + 300); // Duration in milliseconds (approximately 60 frames per second)
-        rotationAnimator.start();
-
-        // Repeat the animation by recursively calling startRotation()
-        rotationAnimator.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(@NonNull Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(@NonNull Animator animation) {
-                startRotation();
-            }
-
-
-            @Override
-            public void onAnimationCancel(@NonNull Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(@NonNull Animator animation) {
-
-            }
-        });
     }
 
     private void vibrationGoesCrazy() {
@@ -374,9 +365,6 @@ public class FishingGame extends AppCompatActivity {
         reeling();
     }
 
-
-
-
     private void startFishTimer() {
         Random rand = new Random();
         int minTime = 500;
@@ -397,6 +385,8 @@ public class FishingGame extends AppCompatActivity {
                     vibrator.vibrate(VibrationEffect.createOneShot(8000-(int)(150*fish.getWeight()), VibrationEffect.DEFAULT_AMPLITUDE)); //användare har 1 sek på sig att reagera, kan höja o sänka beroende på fisk
                 }
                 warningVibrationOn = true;
+                redBorder.setAlpha(0.2f);
+
                 Timer secondTimer = new Timer();
                 secondTimer.schedule(new TimerTask() {
                     @Override
@@ -405,6 +395,8 @@ public class FishingGame extends AppCompatActivity {
 
                         reelGestureSpot.setImageResource(R.drawable.stop_reel);
                         innerTimer = new Timer();
+
+                        redBorder.setAlpha(0.5f);
 
                         innerTimer.schedule(new TimerTask() {
                             @Override
@@ -417,6 +409,7 @@ public class FishingGame extends AppCompatActivity {
                                 warningVibrationOn = false;
                                 startFishTimer();
 
+                                redBorder.setAlpha(0f);
                             }
                         }, 3000); // 3000 milliseconds = 3 seconds
                     }
@@ -470,10 +463,12 @@ public class FishingGame extends AppCompatActivity {
         public void onSensorChanged(SensorEvent event) {
             float z = event.values[2];
 
-            if (z > 5) {
-                castLinePlayer.start();
+            if (z > 5 || z < -5) {
+                if (castLinePlayer != null) castLinePlayer.start();
                 waitForFish();
             }
+
+
         }
 
         @Override
@@ -488,10 +483,9 @@ public class FishingGame extends AppCompatActivity {
         public void onSensorChanged(SensorEvent event) {
             float z = event.values[2];
             if (z < -2) {
-                timer.cancel();
+                cancelFishTimer();
                 startFishTimer();
                 startReeling();
-
             }
         }
 
@@ -506,7 +500,7 @@ public class FishingGame extends AppCompatActivity {
 
         @Override
         public void onSensorChanged(SensorEvent event) {
-            if (!isReeling && event.values[0] >= 0 && event.values[0] <= 9) {
+            if (!isReeling && event.values[0] >= 0 && event.values[0] <= 9 && !escapingFish) {
                 isReeling = true;
                 reelDistance -= 50;
                 reelSound();
@@ -524,6 +518,11 @@ public class FishingGame extends AppCompatActivity {
                         isReeling = false;
                     }
                 }, 500); // Adjust the delay time (in milliseconds) as needed
+            } else if (!isReeling && event.values[0] >= 0 && event.values[0] <= 9 && escapingFish) {
+                cancelFishTimer();
+                failed = true;
+                sensorManager.unregisterListener(reelingSensorListener);
+                onReset();
             }
         }
 
