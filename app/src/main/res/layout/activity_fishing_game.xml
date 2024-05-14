@@ -34,30 +34,56 @@
         app:srcCompat="@drawable/fishing_rod" />
 
     <ImageView
-        android:id="@+id/gesture"
-        android:layout_width="247dp"
-        android:layout_height="344dp"
-        android:layout_marginBottom="200dp"
+        android:id="@+id/reelGesture"
+        android:layout_width="264dp"
+        android:layout_height="378dp"
+        android:layout_marginBottom="328dp"
         android:rotation="270"
+        android:alpha="0"
         app:layout_constraintBottom_toBottomOf="@+id/horizon"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/gesture" />
+        app:layout_constraintHorizontal_bias="0.6"
+        app:srcCompat="@drawable/reel" />
+
+
+<!--    <ImageView-->
+<!--        android:id="@+id/stopGesture"-->
+<!--        android:layout_width="264dp"-->
+<!--        android:layout_height="378dp"-->
+<!--        android:layout_marginBottom="328dp"-->
+<!--        android:rotation="270"-->
+<!--        android:alpha="0"-->
+<!--        app:layout_constraintBottom_toBottomOf="@+id/horizon"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.6"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:srcCompat="@drawable/stop_reel" />-->
 
     <ImageView
-        android:id="@+id/stopGesture"
-        android:layout_width="243dp"
-        android:layout_height="290dp"
-        android:layout_marginBottom="50dp"
-        android:rotation="270"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:id="@+id/castGesture"
+        android:layout_width="322dp"
+        android:layout_height="571dp"
+        android:layout_marginBottom="228dp"
+        app:layout_constraintBottom_toBottomOf="@+id/horizon"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintHorizontal_bias="0.7"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.299"
-        app:srcCompat="@drawable/stopgesture" />
+        app:srcCompat="@drawable/cast2" />
+
+<!--    <ImageView-->
+<!--        android:id="@+id/strikeGesture"-->
+<!--        android:layout_width="322dp"-->
+<!--        android:layout_height="571dp"-->
+<!--        android:layout_marginBottom="228dp"-->
+<!--        android:alpha="0"-->
+<!--        app:layout_constraintBottom_toBottomOf="@+id/horizon"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.7"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintVertical_bias="1.0"-->
+<!--        app:srcCompat="@drawable/strike" />-->
 
     <ImageView
         android:id="@+id/fish"
@@ -65,10 +91,10 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"
+        app:layout_constraintVertical_bias="0.0"
         app:srcCompat="@drawable/fish_look" />
 
     <Button
@@ -98,21 +124,6 @@
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/restart"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/map"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Map"
-        android:backgroundTint="@color/popup"
-        android:background="@drawable/rounded_button"
-        android:textColor="@color/yellow"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.049"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

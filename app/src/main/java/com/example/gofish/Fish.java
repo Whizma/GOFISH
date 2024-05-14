@@ -14,7 +14,7 @@ public class Fish {
         Random r = new Random();
 
         switch (location) {
-            case "lake":
+            case "Lake":
                 if (r.nextFloat() < 0.95) {
                     this.name = "Northern pike";
                     this.latin = "Esox lucius";
@@ -26,13 +26,13 @@ public class Fish {
                 }
                 this.fishImage = R.drawable.pike;
                 break;
-            case "dock":
+            case "Dock":
                 this.name = "Brown trout";
                 this.latin = "salmo trutta";
                 this.weight = (float)Math.round((4f + 4f*r.nextFloat())*10)/10; // 4 - 8 kg
                 this.fishImage = R.drawable.trout;
                 break;
-            case "beach":
+            case "Beach":
                 this.name = "European perch";
                 this.latin = "Perca fluviatilis";
                 this.weight = (float)Math.round((0.5f + 2f*r.nextFloat())*10)/10; // 0.5 - 2.5 kg

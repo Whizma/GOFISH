@@ -67,14 +67,13 @@ public class FishingGame extends AppCompatActivity {
     private ImageView fishImage;
     private TextView fishInfo;
     private ImageView ocean;
-    private ImageView gesture;
-    private ImageView stopGesture;
+    private ImageView reelGestureSpot;
+    private ImageView castGestureSpot;
     private Button restart;
     private Boolean escapingFish;
 
     private Fish fish;
 
-    private Button map;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,25 +116,18 @@ public class FishingGame extends AppCompatActivity {
         fishImage.setAlpha(0f);
         fishInfo = findViewById(R.id.fishInfo);
         fishInfo.setAlpha(0f);
-        gesture = findViewById(R.id.gesture);
-        gesture.setAlpha(0f);
-        stopGesture = findViewById(R.id.stopGesture);
-        stopGesture.setAlpha(0f);
+
+        reelGestureSpot = findViewById(R.id.reelGesture);
+        reelGestureSpot.setAlpha(0f);
+
+        castGestureSpot = findViewById(R.id.castGesture);
+        castGestureSpot.setAlpha(1f);
+
         restart = findViewById(R.id.restart);
-        restart.setVisibility(View.INVISIBLE);
+        restart.setAlpha(0f);
         restart.setEnabled(false);
 
         //timer = new Timer(); //hade problem med denna
-
-        Button map = findViewById(R.id.map);
-        map.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Create an intent to navigate back to the map activity
-                Intent intent = new Intent(FishingGame.this, Map.class);
-                startActivity(intent);
-            }
-        });
 
         currentRotation = 0;
 
@@ -144,7 +136,7 @@ public class FishingGame extends AppCompatActivity {
 
     private void initializeMediaPlayers() {
         castLinePlayer = MediaPlayer.create(this, R.raw.fishing_splash);
-        lowBubblePlayer = MediaPlayer.create(this, R.raw.low_instensity_bubbles);
+        lowBubblePlayer = MediaPlayer.create(this, R.raw.low_instensity_bubble);
         loudBubblePlayer = MediaPlayer.create(this, R.raw.bubble);
         reelPlayer = MediaPlayer.create(this, R.raw.reel);
         exclamationsPlayer = MediaPlayer.create(this, exclamations[new Random().nextInt(exclamations.length)]);
@@ -164,12 +156,17 @@ public class FishingGame extends AppCompatActivity {
 
         initializeMediaPlayers();
 
-        gesture.setAlpha(0);
+
+        reelGestureSpot.setImageResource(R.drawable.reel);
+        reelGestureSpot.setAlpha(0f);
+
         if (failed) {
             linebreakPlayer.start();
         }
         escapingFish = false;
         rod.setRotationX(0);
+        castGestureSpot.setImageResource(R.drawable.cast2);
+        castGestureSpot.setAlpha(1f);
         sensorManager.registerListener(castLineSensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
         failed = false;
     }
@@ -212,6 +209,7 @@ public class FishingGame extends AppCompatActivity {
         sensorManager.registerListener(nibblingSensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
 
         rod.setRotationX(50);
+        castGestureSpot.setImageResource(R.drawable.strike);
 
         loudBubblePlayer.start();
 
@@ -265,7 +263,8 @@ public class FishingGame extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                restart.setVisibility(View.INVISIBLE);
+//                restart.setVisibility(View.INVISIBLE);
+                restart.setAlpha(0f);
                 restart.setEnabled(false);
                 fishInfo.setText("");
                 fishInfo.setAlpha(0f);
@@ -274,7 +273,8 @@ public class FishingGame extends AppCompatActivity {
                 onReset();
             }
         });
-        restart.setVisibility(View.VISIBLE);
+//        restart.setVisibility(View.VISIBLE);
+        restart.setAlpha(1f);
         restart.setEnabled(true);
 
     }
@@ -367,7 +367,10 @@ public class FishingGame extends AppCompatActivity {
         int minDistance = 150;
         int maxDistance = 250;
         reelDistance = (int)(fish.getWeight()*30) + rand.nextInt(maxDistance - minDistance) + minDistance;
-        gesture.setAlpha(1f);
+
+        castGestureSpot.setAlpha(0f);
+        reelGestureSpot.setAlpha(1f);
+
         reeling();
     }
 
@@ -379,6 +382,7 @@ public class FishingGame extends AppCompatActivity {
         int minTime = 500;
         int maxTime = 8000;
         int randomTime = rand.nextInt(maxTime - minTime) + minTime;
+        castGestureSpot.setAlpha(1f);
 
         timer = new Timer();
         timer.schedule(new TimerTask() {
@@ -398,14 +402,17 @@ public class FishingGame extends AppCompatActivity {
                     @Override
                     public void run() {
                         escapingFish = true;
-                        stopGesture.setAlpha(1f);
+
+                        reelGestureSpot.setImageResource(R.drawable.stop_reel);
                         innerTimer = new Timer();
 
                         innerTimer.schedule(new TimerTask() {
                             @Override
                             public void run() {
                                 escapingFish = false;
-                                stopGesture.setAlpha(0f);
+
+                                reelGestureSpot.setAlpha(0f);
+
                                 // You might want to add any additional logic here if needed
                                 warningVibrationOn = false;
                                 startFishTimer();
@@ -417,6 +424,7 @@ public class FishingGame extends AppCompatActivity {
 
             }
         }, randomTime);
+        castGestureSpot.setImageResource(R.drawable.strike);
     }
 
     // Method to cancel the fish timer
@@ -428,7 +436,8 @@ public class FishingGame extends AppCompatActivity {
         if (innerTimer != null) {
             innerTimer.cancel();
             escapingFish = false;
-            stopGesture.setAlpha(0f);
+
+            reelGestureSpot.setAlpha(0f);
             innerTimer = null; // Reset the timer reference
         }
     }
@@ -497,14 +506,14 @@ public class FishingGame extends AppCompatActivity {
 
         @Override
         public void onSensorChanged(SensorEvent event) {
-            if (!isReeling && event.values[0] >= 0 && event.values[0] <= 9 && !escapingFish) {
+            if (!isReeling && event.values[0] >= 0 && event.values[0] <= 9) {
                 isReeling = true;
                 reelDistance -= 50;
                 reelSound();
                 if (reelDistance > 0) {
 
                 } else {
-                    gesture.setAlpha(0);
+                    reelGestureSpot.setAlpha(0f);
                     caughtFish();
                 }
 
@@ -515,11 +524,6 @@ public class FishingGame extends AppCompatActivity {
                         isReeling = false;
                     }
                 }, 500); // Adjust the delay time (in milliseconds) as needed
-            } else if (!isReeling && event.values[0] >= 0 && event.values[0] <= 9 && escapingFish) {
-                cancelFishTimer();
-                failed = true;
-                sensorManager.unregisterListener(reelingSensorListener);
-                onReset();
             }
         }
 
