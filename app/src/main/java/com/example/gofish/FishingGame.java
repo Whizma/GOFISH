@@ -202,6 +202,7 @@ public class FishingGame extends AppCompatActivity {
         castGestureSpot.setAlpha(1f);
         sensorManager.registerListener(castLineSensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
         failed = false;
+        castGestureSpot.setImageResource(R.drawable.cast2);
     }
 
     @Override
@@ -377,7 +378,7 @@ public class FishingGame extends AppCompatActivity {
         int minTime = 500;
         int maxTime = 8000;
         int randomTime = rand.nextInt(maxTime - minTime) + minTime;
-        castGestureSpot.setAlpha(1f);
+        //castGestureSpot.setAlpha(1f);
 
         timer = new Timer();
         timer.schedule(new TimerTask() {
@@ -411,7 +412,7 @@ public class FishingGame extends AppCompatActivity {
                             public void run() {
                                 escapingFish = false;
 
-                                reelGestureSpot.setAlpha(0f);
+                                reelGestureSpot.setImageResource(R.drawable.reel);
 
                                 // You might want to add any additional logic here if needed
                                 warningVibrationOn = false;
@@ -425,7 +426,7 @@ public class FishingGame extends AppCompatActivity {
 
             }
         }, randomTime);
-        castGestureSpot.setImageResource(R.drawable.strike);
+        //castGestureSpot.setImageResource(R.drawable.strike);
     }
 
     // Method to cancel the fish timer
