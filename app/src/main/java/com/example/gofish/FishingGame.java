@@ -405,12 +405,16 @@ public class FishingGame extends AppCompatActivity {
             timer.cancel();
             timer = null; // Reset the timer reference
         }
-
+        if (secondTimer != null) {
+            secondTimer.cancel();
+            secondTimer = null;
+        }
         if (innerTimer != null) {
             innerTimer.cancel();
             escapingFish = false;
-            runOnUiThread(() -> tutorialImage.setAlpha(0f));
             innerTimer = null; // Reset the timer reference
+            runOnUiThread(() -> tutorialImage.setAlpha(0f));
+            redBorder.setAlpha(0f);
         }
     }
 
@@ -503,10 +507,6 @@ public class FishingGame extends AppCompatActivity {
                 }, 500); // Adjust the delay time (in milliseconds) as needed
             } else if (!isReeling && event.values[0] >= 0 && event.values[0] <= 9 && escapingFish) {
                 cancelFishTimer();
-                if (secondTimer != null) {
-                    secondTimer.cancel();
-                    secondTimer = null;
-                }
                 failed = true;
                 sensorManager.unregisterListener(reelingSensorListener);
                 onReset();
