@@ -4,6 +4,7 @@ import static android.app.PendingIntent.getActivity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
@@ -88,6 +89,13 @@ public class FishingGame extends AppCompatActivity {
         if (location.equals("Dock")) {
             currentState[2] = true;
         }
+        Intent intent = new Intent("locationUnlocked");
+        intent.putExtra("currentState", currentState);
+        for(int i = 0; i < currentState.length; i++) {
+            System.out.println(currentState[i]);
+        }
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        localBroadcastManager.sendBroadcast(intent);
     }
 
     @Override

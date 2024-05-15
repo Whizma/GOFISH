@@ -1,22 +1,38 @@
 package com.example.gofish;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class Map extends AppCompatActivity implements StateChangeListener {
+public class Map extends AppCompatActivity {
     private ImageView fishMapImage;
 
     private ImageButton beachButton;
     private ImageButton dockButton;
     private ImageButton lakeButton;
+
+
+    private ImageView dockStar1;
+    private ImageView dockStar2;
+    private ImageView lakeStar1;
+    private ImageView lakeStar2;
+    private ImageView lakeStar3;
+    private TextView dockText;
+    private TextView lakeText;
+
+
+
 
     private String beachInfo;
     private String dockInfo;
@@ -28,6 +44,40 @@ public class Map extends AppCompatActivity implements StateChangeListener {
 
     public boolean[] currentState = {true, false, false};
 
+    protected void onResume() {
+        super.onResume();
+        MyBroadcastReceiver localBroadcastReceiver = new MyBroadcastReceiver();
+        IntentFilter intentFilter = new IntentFilter("locationUnlocked");
+        LocalBroadcastManager.getInstance(this).registerReceiver(localBroadcastReceiver, intentFilter);
+    }
+    public class MyBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle extras = intent.getExtras();
+            currentState = (boolean[]) extras.get("currentState");
+            for (int i = 0; i < currentState.length; i++) {
+                if (currentState[i] && i == 1) {
+                    dockButton.setClickable(true);
+                    dockButton.setAlpha(1.0f);
+                    dockStar1.setAlpha(1.0f);
+                    dockStar2.setAlpha(1.0f);
+                    dockText.setAlpha(1.0f);
+                    dockButton.setOnClickListener(new OnLocationClickListener("Dock", dockInfo, R.drawable.dock_popup2));
+                }
+                if (currentState[i] && i == 2) {
+                    lakeButton.setClickable(true);
+                    lakeButton.setAlpha(1.0f);
+                    lakeStar1.setAlpha(1.0f);
+                    lakeStar2.setAlpha(1.0f);
+                    lakeStar3.setAlpha(1.0f);
+                    lakeText.setAlpha(1.0f);
+                    lakeButton.setOnClickListener(new OnLocationClickListener("Lake", lakeInfo, R.drawable.lake_popup));
+                }
+            }
+        }
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,18 +86,38 @@ public class Map extends AppCompatActivity implements StateChangeListener {
         beachButton = (ImageButton) findViewById(R.id.beach);
         dockButton = (ImageButton) findViewById(R.id.dock);
         lakeButton = (ImageButton) findViewById(R.id.lake);
+
+        dockStar1 = (ImageView) findViewById(R.id.dock_star1);
+        dockStar2 = (ImageView) findViewById(R.id.dock_star2);
+
+        lakeStar1 = (ImageView) findViewById(R.id.lake_star1);
+        lakeStar2 = (ImageView) findViewById(R.id.lake_star2);
+        lakeStar3 = (ImageView) findViewById(R.id.lake_star3);
+
+        dockText = (TextView) findViewById(R.id.dockText);
+        lakeText = (TextView) findViewById(R.id.lakeText);
+
+
+        dockButton.setOnClickListener(null);
+        dockButton.setClickable(false);
+        dockStar1.setAlpha(0.3f);
+        dockStar2.setAlpha(0.3f);
+        dockButton.setAlpha(0.3f);
+        dockText.setAlpha(0.3f);
+
+        lakeButton.setOnClickListener(null);
+        lakeButton.setClickable(false);
+        lakeStar1.setAlpha(0.3f);
+        lakeStar2.setAlpha(0.3f);
+        lakeStar3.setAlpha(0.3f);
+        lakeButton.setAlpha(0.3f);
+        lakeText.setAlpha(0.3f);
+
         beachInfo = "The beach is a great starting point for catching your first fish, the friendly Perch";
         dockInfo = "Continue your fishing journey at the dock, and try to catch the elusive Brown Trout";
         lakeInfo = "Let any fish who meets your gaze learn the true meaning of fear; for you are the harbinger of death. The bane of creatures sub-aqueous, your rod is true and unwavering as you cast into the aquatic abyss. You, scorned by this uncaring Earth, finds solace in the sea. Your only friend, the worm upon your hook. Wriggling, writhing, struggling to surmount the mortal pointlessness that permeates this barren world. You are alone. You are empty. And yet, You fish. Beware of the lake, and beware of the ole mighty GammelGäddan";
 
         beachButton.setOnClickListener(new OnLocationClickListener("Beach", beachInfo, R.drawable.beach_popup2));
-        dockButton.setOnClickListener(new OnLocationClickListener("Dock", dockInfo, R.drawable.dock_popup2));
-        lakeButton.setOnClickListener(new OnLocationClickListener("Lake", lakeInfo, R.drawable.lake_popup));
-    }
-
-    @Override
-    public void onStateChange(int index) {
-        currentState[index] = true;
     }
 
     final Map map = this;
