@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -103,6 +104,8 @@ public class FishingGame extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fishing_game);
 
+        System.out.println("OnCreate Called");
+
         Intent intent = getIntent();
         if (intent != null) {
             location = intent.getStringExtra("location");
@@ -122,13 +125,18 @@ public class FishingGame extends AppCompatActivity {
 
         lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
 
-        castLineSensorListener = new CastLineSensorListener();
-        nibblingSensorListener = new FishNibblingSensorListener();
+        castLineSensorListener = new CastLineSensorListener(this);
+        nibblingSensorListener = new FishNibblingSensorListener(this);
         reelingSensorListener = new ReelingSensorListener();
 
         initializeMediaPlayers();
 
         background = findViewById(R.id.horizon);
+
+        reelGestureSpot = findViewById(R.id.reelGesture);
+        reelGestureSpot.setAlpha(0f);
+        castGestureSpot = findViewById(R.id.castGesture);
+        castGestureSpot.setAlpha(1f);
 
         chosenLocation(location);
 
@@ -146,12 +154,6 @@ public class FishingGame extends AppCompatActivity {
         fishInfo = findViewById(R.id.fishInfo);
         fishInfo.setAlpha(0f);
 
-        reelGestureSpot = findViewById(R.id.reelGesture);
-        reelGestureSpot.setAlpha(0f);
-
-        castGestureSpot = findViewById(R.id.castGesture);
-        castGestureSpot.setAlpha(1f);
-
         restart = findViewById(R.id.restart);
         restart.setAlpha(0f);
         restart.setEnabled(false);
@@ -168,6 +170,7 @@ public class FishingGame extends AppCompatActivity {
         initializeMediaPlayers();
         sensorManager.registerListener(castLineSensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
 
+        System.out.println("OnStart Called");
     }
 
     private void initializeMediaPlayers() {
@@ -175,9 +178,9 @@ public class FishingGame extends AppCompatActivity {
         lowBubblePlayer = MediaPlayer.create(this, R.raw.low_instensity_bubble);
         loudBubblePlayer = MediaPlayer.create(this, R.raw.bubble);
         reelPlayer = MediaPlayer.create(this, R.raw.reel);
-        mothuggPlayer = MediaPlayer.create(this, R.raw.woosh);
-        exclamationsPlayer = MediaPlayer.create(this, exclamations[new Random().nextInt(exclamations.length)]);
+        mothuggPlayer = MediaPlayer.create(this, R.raw.whoosh);
         linebreakPlayer = MediaPlayer.create(this, R.raw.fail);
+        exclamationsPlayer = MediaPlayer.create(this, exclamations[new Random().nextInt(exclamations.length)]);
     }
 
     private void onReset() {
@@ -186,17 +189,15 @@ public class FishingGame extends AppCompatActivity {
             secondTimer.cancel();
             secondTimer = null;
         }
-        castLinePlayer.release();
-        lowBubblePlayer.release();
-        loudBubblePlayer.release();
-        reelPlayer.release();
-        exclamationsPlayer.release();
-        linebreakPlayer.release();
+        if (castLinePlayer != null) castLinePlayer.release();
+        if (lowBubblePlayer != null) lowBubblePlayer.release();
+        if (loudBubblePlayer != null)  loudBubblePlayer.release();
+        if (reelPlayer != null) reelPlayer.release();
+        if (exclamationsPlayer != null) exclamationsPlayer.release();
+        if (linebreakPlayer != null)  linebreakPlayer.release();
         vibrator.cancel();
 
-
         initializeMediaPlayers();
-
 
         reelGestureSpot.setImageResource(R.drawable.reel);
         reelGestureSpot.setAlpha(0f);
@@ -216,15 +217,22 @@ public class FishingGame extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        ambientPlayer.release();
-        castLinePlayer.release();
-        lowBubblePlayer.release();
-        loudBubblePlayer.release();
-        reelPlayer.release();
-        exclamationsPlayer.release();
-        linebreakPlayer.release();
+
+        if (ambientPlayer != null) ambientPlayer.release();
+        if (castLinePlayer != null) castLinePlayer.release();
+        if (lowBubblePlayer != null) lowBubblePlayer.release();
+        if (loudBubblePlayer != null) loudBubblePlayer.release();
+        if (reelPlayer != null) reelPlayer.release();
+        if (linebreakPlayer != null) linebreakPlayer.release();
+        if (exclamationsPlayer != null) exclamationsPlayer.release();
+
+        sensorManager.unregisterListener(castLineSensorListener);
+        sensorManager.unregisterListener(nibblingSensorListener);
+        sensorManager.unregisterListener(reelingSensorListener);
+
         vibrator.cancel();
         cancelFishTimer();
+        System.out.println("OnDestroy Called");
     }
 
 
@@ -234,9 +242,16 @@ public class FishingGame extends AppCompatActivity {
         int minDelay = 5000;
         int maxDelay = 10000;
         int delay = rand.nextInt(maxDelay - minDelay) + minDelay;
-        lowBubblePlayer.start();
+        if (lowBubblePlayer!= null) {
+            lowBubblePlayer.start();
+        } else {
+            lowBubblePlayer = MediaPlayer.create(this, R.raw.low_instensity_bubble);
+        }
+
         cancelFishTimer();
         timer = new Timer();
+        sensorManager.unregisterListener(castLineSensorListener);
+
         timer.schedule(new TimerTask() {
 
             @Override
@@ -248,14 +263,18 @@ public class FishingGame extends AppCompatActivity {
     }
 
     private void fishStartsNibbling() {
-
-        sensorManager.unregisterListener(castLineSensorListener);
         sensorManager.registerListener(nibblingSensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
 
         rod.setRotationX(50);
+        castGestureSpot.setAlpha(1f);
         castGestureSpot.setImageResource(R.drawable.strike);
 
-        loudBubblePlayer.start();
+        if (lowBubblePlayer!= null) {
+            lowBubblePlayer.start();
+        } else {
+            lowBubblePlayer = MediaPlayer.create(this, R.raw.low_instensity_bubble);
+            lowBubblePlayer.start();
+        }
 
 
         long[] timings = new long[]{300, 800};
@@ -279,8 +298,12 @@ public class FishingGame extends AppCompatActivity {
 
     private void caughtFish() {
 
+        redBorder.setAlpha(0f);
         cancelFishTimer();
-        exclamationsPlayer.start();
+
+        if (exclamationsPlayer != null) {
+            exclamationsPlayer.start();
+        }
 
         sensorManager.unregisterListener(reelingSensorListener);
         ObjectAnimator fadeIn = ObjectAnimator.ofFloat(fishImage, "alpha", 0f, 1f);
@@ -348,6 +371,8 @@ public class FishingGame extends AppCompatActivity {
             case "Lake":
                 ambientPlayer = MediaPlayer.create(this, R.raw.ambient_lake);
                 background.setImageResource(R.drawable.lake2);
+                castGestureSpot.setVisibility(View.INVISIBLE);
+                reelGestureSpot.setVisibility(View.INVISIBLE);
                 break;
             case "Beach":
                 ambientPlayer = MediaPlayer.create(this, R.raw.beach);
@@ -369,7 +394,6 @@ public class FishingGame extends AppCompatActivity {
     }
 
     public void startReeling(){
-        reelPlayer.start(); //markera att fisken ska reelas in - wip - ska ändras
         Random rand = new Random();
         int minDistance = 150;
         int maxDistance = 250;
@@ -481,16 +505,26 @@ public class FishingGame extends AppCompatActivity {
 
     class CastLineSensorListener implements SensorEventListener {
 
+        Context context;
+        public CastLineSensorListener(Context t) {
+            context = t;
+        }
+
         @Override
         public void onSensorChanged(SensorEvent event) {
             float z = event.values[2];
 
             if (z > 5 || z < -5) {
-                if (castLinePlayer != null) castLinePlayer.start();
+                System.out.println(castLinePlayer);
+                if (castLinePlayer != null) {
+                    castLinePlayer.start();
+                } else {
+                    castLinePlayer = MediaPlayer.create(context, R.raw.fishing_splash);
+                    castLinePlayer.start();
+                }
+                castGestureSpot.setAlpha(0f);
                 waitForFish();
             }
-
-
         }
 
         @Override
@@ -501,10 +535,21 @@ public class FishingGame extends AppCompatActivity {
 
     class FishNibblingSensorListener implements SensorEventListener {
 
+        Context t;
+
+        public FishNibblingSensorListener(Context t) {
+            this.t = t;
+        }
         @Override
         public void onSensorChanged(SensorEvent event) {
             float z = event.values[2];
             if (z < -2) {
+                if (mothuggPlayer != null) {
+                    mothuggPlayer.start();
+                } else {
+                    mothuggPlayer = MediaPlayer.create(t, R.raw.whoosh);
+                    mothuggPlayer.start();
+                }
                 cancelFishTimer();
                 startFishTimer();
                 startReeling();
